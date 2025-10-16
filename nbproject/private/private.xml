@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="3">
+        <file>
+            <url>functions/system_cmd.c</url>
+            <bookmark id="2">
+                <name/>
+                <line>33</line>
+                <key/>
+            </bookmark>
+            <bookmark id="1">
+                <name/>
+                <line>89</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>mcc_generated_files/timer/src/tcb0.c</url>
+            <bookmark id="3">
+                <name/>
+                <line>0</line>
+                <key/>
+            </bookmark>
+        </file>
+    </editor-bookmarks>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/main.c</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/modbus.c</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/system_registers.c</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/temp_sensors.h</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/ds18b20.h</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/ds18b20.c</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/system_registers.h</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/temp_sensors.c</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/modbus.h</file>
+        </group>
+    </open-files>
+</project-private>

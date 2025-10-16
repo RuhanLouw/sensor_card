@@ -1,0 +1,209 @@
+#include <stdint.h>
+#include <math.h>
+
+// Assume these functions exist (from previous response)
+uint16_t read_mcp3201(void); // Reads 12-bit ADC value
+
+// Constants (adjust as needed)
+#define V_REF 3.0        // Reference voltage (V)
+#define R_FIXED 10000.0  // Fixed resistor (ohms)
+#define R_25 10000.0     // NTC resistance at 25°C (ohms)
+#define BETA 3977.0      // Beta value (K)
+#define T_25 298.15      // 25°C in Kelvin
+
+/**
+ * Reads temperature from NTC thermistor
+ * Returns: Temperature in Celsius
+ */
+float read_temperature(void) {
+    // Read ADC value (0?4095)
+    uint16_t adc_value = read_mcp3201();
+    
+    // Calculate V_IN
+    float v_in = (adc_value / 4095.0) * V_REF;
+    
+    // Calculate R_NTC
+    float r_ntc = (v_in * R_FIXED) / (V_REF - v_in);
+    
+    // Calculate temperature using Beta equation
+    float temp_k = 1.0 / ((1.0 / T_25) + (1.0 / BETA) * log(r_ntc / R_25));
+    float temp_c = temp_k - 273.15;
+    
+    return temp_c;
+}
+
+/**
+ * Example main function
+ */
+int main(void) {
+    float temperature;
+    
+    // Initialize SPI and GPIO (MCU-specific)
+    
+    while (1) {
+        temperature = read_temperature();
+        // Use temperature (e.g., print, log)
+        // Example: printf("Temperature: %.2f°C\n", temperature);
+    }
+}
+
+===========================================================
+===========================================================
+//// =================== sensor v1 comms ==================
+===========================================================
+
+#include <avr/io.h>
+#include "definitions.h" // Include protocol definitions
+#include "mcc_generated_files/system/system.h" // MCC-generated files for AVR128DB32
+
+// Buffer to store incoming message
+static volatile uint8_t rxBuffer[MAX_MESSAGE_LEN];
+static volatile uint8_t rxIndex = 0;
+static volatile bool messageReceived = false;
+
+// UART receive interrupt callback (set by MCC)
+void UART1_RxISR(void) {
+    // Read a byte from UART1 (MCC function)
+    uint8_t rxByte = UART1_Read();
+    
+    // Check for start byte to begin new message
+    if (rxIndex == 0 && rxByte != START_BYTE) {
+        return; // Ignore byte if not start byte
+    }
+    
+    // Store byte in buffer
+    rxBuffer[rxIndex++] = rxByte;
+    
+    // Check if full message is received (fixed 7 bytes for CMD_READ_SELECTED_SENSORS)
+    if (rxIndex >= 7) {
+        // Verify end byte
+        if (rxBuffer[6] == END_BYTE) {
+            messageReceived = true; // Flag complete message
+        }
+        rxIndex = 0; // Reset buffer index
+    }
+}
+
+// Process a received command
+void processCommand(void) {
+    // Check if a complete message was received
+    if (!messageReceived) {
+        return; // No message to process
+    }
+    
+    // Disable interrupts to process message safely
+    cli();
+    messageReceived = false; // Clear flag
+    uint8_t cmd = rxBuffer[1]; // Extract command ID
+    uint8_t len = rxBuffer[2]; // Extract data length
+    uint8_t payload[2]; // Payload for sensor bitmask
+    payload[0] = rxBuffer[3]; // High byte of bitmask
+    payload[1] = rxBuffer[4]; // Low byte of bitmask
+    uint8_t checksum = rxBuffer[5]; // Received checksum
+    
+    // Calculate checksum (sum of start through payload)
+    uint8_t calcChecksum = START_BYTE + cmd + len + payload[0] + payload[1];
+    
+    // Verify checksum and length
+    if (checksum != calcChecksum || len != 2) {
+        sei(); // Re-enable interrupts
+        sendErrorResponse(ERROR_INVALID_CMD); // Send error for invalid command
+        return;
+    }
+    
+    // Process CMD_READ_SELECTED_SENSORS
+    if (cmd == CMD_READ_SELECTED_SENSORS) {
+        // Combine payload into 16-bit sensor bitmask
+        uint16_t sensorBitmask = (payload[0] << 8) | payload[1];
+        
+        // Check for invalid reserved bits (9-15)
+        if (sensorBitmask & 0xFE00) {
+            sei(); // Re-enable interrupts
+            sendErrorResponse(ERROR_INVALID_SENSOR); // Send error for invalid selection
+            return;
+        }
+        
+        // Prepare response payload
+        uint8_t respPayload[MAX_PAYLOAD_LEN];
+        uint8_t respLen = 0;
+        
+        // Read selected sensors (NTC 1-8, then K-type)
+        for (uint8_t i = 0; i < SENSOR_COUNT; i++) {
+            if (sensorBitmask & (1 << i)) { // Check if sensor is selected
+                uint16_t temp = (i < 8) ? readNTCSensor(i + 1) : readKTypeSensor();
+                respPayload[respLen++] = temp >> 8; // High byte
+                respPayload[respLen++] = temp & 0xFF; // Low byte
+            }
+        }
+        
+        // Send response with sensor data
+        sendResponse(CMD_READ_SELECTED_SENSORS, respPayload, respLen);
+    } else {
+        // Unknown command
+        sendErrorResponse(ERROR_INVALID_CMD);
+    }
+    
+    // Re-enable interrupts
+    sei();
+}
+
+// Send response message
+void sendResponse(uint8_t respID, uint8_t* payload, uint8_t len) {
+    // Create response buffer
+    uint8_t buffer[MAX_MESSAGE_LEN];
+    buffer[0] = START_BYTE; // Start byte: 0xAA
+    buffer[1] = respID; // Response ID (matches command or RESP_ERROR)
+    buffer[2] = len; // Payload length
+    // Copy payload data
+    for (uint8_t i = 0; i < len; i++) {
+        buffer[3 + i] = payload[i];
+    }
+    // Calculate checksum (start through payload)
+    uint8_t checksum = 0;
+    for (uint8_t i = 0; i < 3 + len; i++) {
+        checksum += buffer[i];
+    }
+    buffer[3 + len] = checksum; // Add checksum
+    buffer[4 + len] = END_BYTE; // End byte: 0xBB
+    
+    // Send message using MCC UART function
+    for (uint8_t i = 0; i < 5 + len; i++) {
+        UART1_Write(buffer[i]);
+    }
+}
+
+// Send error response
+void sendErrorResponse(uint8_t errorCode) {
+    uint8_t payload[1] = {errorCode}; // Error code in payload
+    sendResponse(RESP_ERROR, payload, 1); // Send error response
+}
+
+// Placeholder: Read NTC sensor (implement with ADC)
+uint16_t readNTCSensor(uint8_t sensorNum) {
+    // TODO: Read ADC for NTC sensor, convert to temperature (°C × 10)
+    // Example: Use ADC0 on AVR128DB32, configured via MCC
+    return 255; // Dummy: 25.5°C
+}
+
+// Placeholder: Read K-type thermocouple
+uint16_t readKTypeSensor(void) {
+    // TODO: Read K-type via MAX6675/MAX31855 (e.g., via SPI)
+    return 1000; // Dummy: 100.0°C
+}
+
+//// Main function
+//int main(void) {
+//    // Initialize MCC-generated system (clocks, UART, etc.)
+//    SYSTEM_Initialize();
+//    
+//    // Set UART1 receive interrupt callback
+//    UART1_SetRxISR(UART1_RxISR);
+//    
+//    // Enable global interrupts
+//    sei();
+//    
+//    while (1) {
+//        // Process received commands
+//        processCommand();
+//    }
+//}
