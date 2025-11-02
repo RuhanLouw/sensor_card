@@ -36,16 +36,15 @@
 */
 
 #include "../usart1.h"
-#include "../../../functions/modbus.h"
 
 /**
   Section: Macro Declarations
 */
 
-#define USART1_TX_BUFFER_SIZE (8U) //buffer size should be 2^n
+#define USART1_TX_BUFFER_SIZE (1024U) //buffer size should be 2^n
 #define USART1_TX_BUFFER_MASK (USART1_TX_BUFFER_SIZE - 1U) 
 
-#define USART1_RX_BUFFER_SIZE (8U) //buffer size should be 2^n
+#define USART1_RX_BUFFER_SIZE (1024U) //buffer size should be 2^n
 #define USART1_RX_BUFFER_MASK (USART1_RX_BUFFER_SIZE - 1U)
 
 
@@ -84,14 +83,14 @@ const uart_drv_interface_t UART1 = {
 /**
   Section: USART1 variables
 */
-static volatile uint8_t usart1TxHead = 0;
-static volatile uint8_t usart1TxTail = 0;
-static volatile uint8_t usart1TxBufferRemaining;
+static volatile uint16_t usart1TxHead = 0;
+static volatile uint16_t usart1TxTail = 0;
+static volatile uint16_t usart1TxBufferRemaining;
 static volatile uint8_t usart1TxBuffer[USART1_TX_BUFFER_SIZE];
 static volatile bool usart1IsTxComplete;
-static volatile uint8_t usart1RxHead = 0;
-static volatile uint8_t usart1RxTail = 0;
-static volatile uint8_t usart1RxCount;
+static volatile uint16_t usart1RxHead = 0;
+static volatile uint16_t usart1RxTail = 0;
+static volatile uint16_t usart1RxCount;
 static volatile uint8_t usart1RxBuffer[USART1_RX_BUFFER_SIZE];
 /**
  * @misradeviation{@advisory,19.2}
@@ -112,7 +111,7 @@ void (*USART1_TxInterruptHandler)(void);
 /* cppcheck-suppress misra-c2012-8.9 */
 static void (*USART1_TxCompleteInterruptHandler)(void) = NULL;
 void (*USART1_RxInterruptHandler)(void);
-static void (*USART1_RxCompleteInterruptHandler)(uint8_t) = modbus_receive;;
+static void (*USART1_RxCompleteInterruptHandler)(void) = NULL;
 
 static void USART1_DefaultFramingErrorCallback(void);
 static void USART1_DefaultOverrunErrorCallback(void);
@@ -299,7 +298,7 @@ size_t USART1_ErrorGet(void)
 uint8_t USART1_Read(void)
 {
     uint8_t readValue  = 0;
-    uint8_t tempRxTail;
+    uint16_t tempRxTail;
     
     readValue = usart1RxBuffer[usart1RxTail];
     tempRxTail = (usart1RxTail + 1U) & USART1_RX_BUFFER_MASK; // Buffer size of RX should be in the 2^n  
@@ -327,7 +326,7 @@ ISR(USART1_RXC_vect)
 void USART1_ReceiveISR(void)
 {
     uint8_t regValue;
-    uint8_t tempRxHead;
+    uint16_t tempRxHead;
     
     usart1RxStatusBuffer[usart1RxHead].status = 0;
 
@@ -372,7 +371,7 @@ void USART1_ReceiveISR(void)
 	}
     if (NULL != USART1_RxCompleteInterruptHandler)
     {
-        USART1_RxCompleteInterruptHandler(regValue);
+        (*USART1_RxCompleteInterruptHandler)();
     }
     
     else {
@@ -382,7 +381,7 @@ void USART1_ReceiveISR(void)
 
 void USART1_Write(uint8_t txData)
 {
-    uint8_t tempTxHead;
+    uint16_t tempTxHead;
     
     if(0U < usart1TxBufferRemaining) // check if at least one byte place is available in TX buffer
     {
@@ -428,7 +427,7 @@ ISR(USART1_TXC_vect)
 
 void USART1_TransmitISR(void)
 {
-    uint8_t tempTxTail;
+    uint16_t tempTxTail;
 
     // use this default transmit interrupt handler code
     if(sizeof(usart1TxBuffer) > usart1TxBufferRemaining) // check if all data is transmitted
@@ -490,7 +489,7 @@ void USART1_RxCompleteCallbackRegister(void (* callbackHandler)(void))
 {
     if(NULL != callbackHandler)
     {
-//       USART1_RxCompleteInterruptHandler = callbackHandler; 
+       USART1_RxCompleteInterruptHandler = callbackHandler; 
     }   
 }
 

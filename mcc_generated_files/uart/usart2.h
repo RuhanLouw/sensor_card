@@ -82,8 +82,8 @@
 #define UART2_AutoBaudEventEnableGet    (NULL)
 #define UART2_ErrorGet             USART2_ErrorGet
 
-#define UART2_TxCompleteCallbackRegister     (NULL)
-#define UART2_RxCompleteCallbackRegister      (NULL)
+#define UART2_TxCompleteCallbackRegister     USART2_TxCompleteCallbackRegister
+#define UART2_RxCompleteCallbackRegister      USART2_RxCompleteCallbackRegister
 #define UART2_TxCollisionCallbackRegister  (NULL)
 #define UART2_FramingErrorCallbackRegister USART2_FramingErrorCallbackRegister
 #define UART2_OverrunErrorCallbackRegister USART2_OverrunErrorCallbackRegister
@@ -193,7 +193,37 @@ void USART2_ReceiveEnable(void);
  */
 void USART2_ReceiveDisable(void);
 
+/**
+ * @ingroup usart2
+ * @brief This API enables the USART2 transmitter interrupt.
+ * @param None.
+ * @return None.
+ */
+void USART2_TransmitInterruptEnable(void);
 
+/**
+ * @ingroup usart2
+ * @brief This API disables the USART2 transmitter interrupt.
+ * @param None.
+ * @return None.
+ */
+void USART2_TransmitInterruptDisable(void);
+
+/**
+ * @ingroup usart2
+ * @brief This API enables the USART2 receiver interrupt.
+ * @param None.
+ * @return None.
+ */
+void USART2_ReceiveInterruptEnable(void);
+
+/**
+ * @ingroup usart2
+ * @brief This API disables the USART2 receiver interrupt.
+ * @param None.
+ * @return None.
+ */
+void USART2_ReceiveInterruptDisable(void);
 
 /**
  * @ingroup usart2
@@ -307,7 +337,55 @@ void USART2_OverrunErrorCallbackRegister(void (* callbackHandler)(void));
  */
 void USART2_ParityErrorCallbackRegister(void (* callbackHandler)(void));
 
+/**
+ * @ingroup usart2
+ * @brief This function is the ISR function to be called upon Transmitter interrupt.
+ * @param void.
+ * @return None.
+ */
+void USART2_TransmitISR(void);
 
+/**
+ * @ingroup usart2
+ * @brief This indicates the function called when the transmitter interrupt occurs.
+ * @pre Initialize the USART2 module with the transmit interrupt enabled.
+ * @param None.
+ * @return None.
+ */
+extern void (*USART2_TxInterruptHandler)(void);
+
+/**
+ * @ingroup usart2
+ * @brief This API registers the function to be called upon Transmitter interrupt.
+ * @param callbackHandler - a function pointer which will be called upon Transmitter interrupt condition.
+ * @return None.
+ */
+void USART2_TxCompleteCallbackRegister(void (* callbackHandler)(void));
+
+/**
+ * @ingroup usart2
+ * @brief This function is the ISR function to be called upon Receiver interrupt.
+ * @param void.
+ * @return None.
+ */
+void USART2_ReceiveISR(void);
+
+/**
+ * @ingroup usart2
+ * @brief This indicates the function called when the receiver interrupt occurs.
+ * @pre Initialize the USART2 module with the receive interrupt enabled.
+ * @param None.
+ * @return None.
+ */
+extern void (*USART2_RxInterruptHandler)(void);
+
+/**
+ * @ingroup usart2
+ * @brief This API registers the function to be called upon Receiver interrupt.
+ * @param callbackHandler - a function pointer which will be called upon Receiver interrupt condition.
+ * @return None.
+ */
+void USART2_RxCompleteCallbackRegister(void (* callbackHandler)(void));
 
 #if defined(__GNUC__)
 /**

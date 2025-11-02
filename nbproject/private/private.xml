@@ -26,14 +26,13 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/MPLabXide/Sensor_Controller.X/main.c</file>
-            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/modbus.c</file>
             <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/system_registers.c</file>
-            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/temp_sensors.h</file>
-            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/ds18b20.h</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/modbus.c</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/mcc_generated_files/timer/src/tcb0.c</file>
             <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/ds18b20.c</file>
             <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/system_registers.h</file>
-            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/temp_sensors.c</file>
-            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/modbus.h</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/functions/definitions.h</file>
+            <file>file:/C:/MPLabXide/Sensor_Controller.X/mcc_generated_files/uart/src/usart1.c</file>
         </group>
     </open-files>
 </project-private>

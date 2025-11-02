@@ -66,12 +66,31 @@ SYS_SENSORS sys_sensors;
 /* ============================================================
  * FUNCTION: INITIALISE SYSTEM REGISTERS
  * ============================================================ */
-void SYS_REGS_INIT(void){
+void SYS_REGS_INIT(void){   
     // System info registers
     sys_regs[MB_REG_FIRMWARE_VERSION] = 100; // v1.00
     sys_regs[MB_REG_UPTIME_LSW] = 2;         // To be filled from timer
     sys_regs[MB_REG_UPTIME_MSW] = 3;
-    sys_regs[MB_REG_SYSTEM_STATUS] = SYS_STAT_SYSTEM_READY; // | SYS_STAT_SENSOR_POLL_ACTIVE
+    
+    // --- SET ---
+    sys_regs[MB_REG_SYSTEM_STATUS] = SYS_STAT_SYSTEM_READY;
+    sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] = (
+                EN_FLAG_NTC1
+            |   EN_FLAG_NTC2
+            |   EN_FLAG_NTC3
+            |   EN_FLAG_NTC4
+            |   EN_FLAG_NTC5
+            |   EN_FLAG_NTC6
+            |   EN_FLAG_NTC7
+            |   EN_FLAG_NTC8
+            |   EN_FLAG_KTYPE   
+//          |   EN_FLAG_DHT22
+//          |   EN_FLAG_DS18B20_1
+//          |   EN_FLAG_DS18B20_2
+            );
+    
+    // --- NOT SET ---
+    sys_regs[MB_REG_SYSTEM_STATUS] &= ~SYS_STAT_SENSOR_POLL_ACTIVE;
 }
 
 /* ============================================================
@@ -106,8 +125,10 @@ void update_sensor_registers(void) {
  * FUNCTION: Update Sensor Data 
  * ============================================================ */
 void poll_sensors(void) {
+    MEASURE_LED_SET();
     if(sys_regs[MB_REG_COMMAND] & SYS_STAT_SENSOR_POLL_ACTIVE){
         // NTC Poll
+        
         for(uint8_t i=0; i<8; i++){
             if(sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & (EN_FLAG_NTC1 << i)){
                 sys_sensors.ntcs[i] = read_ntc(i, ntc_samples); 
@@ -135,6 +156,7 @@ void poll_sensors(void) {
 //        }
     
         // After polling, update the Modbus register array
+        MEASURE_LED_nSET();
         update_sensor_registers();
     
     }
@@ -187,7 +209,10 @@ void poll_sensors(void) {
  * ============================================================ */
 int main(void) {
     SYSTEM_Initialize();
-    SYS_REGS_INIT();
+//    TCB0_CAPTInterruptEnable();
+//    SYS_REGS_INIT();
+    sys_regs[0] = 0x1234;
+    sys_regs[1] = 0x5678;
     // Initialize hardware, timers, RS485, etc.
     RUN_LED_SET();
     /*Init Functions*/
@@ -195,7 +220,7 @@ int main(void) {
 //    KTYPE_start_conversion();
 
     while (1) {
-//        poll_sensors(); // update sensor structs and registers
+        poll_sensors(); // update sensor structs and registers
         modbus_process(); // Handle Modbus requests from control card
         
         _delay_ms(50); // adjust polling rate

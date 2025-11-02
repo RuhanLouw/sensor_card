@@ -56,7 +56,7 @@
  * @brief Defines the TCB0 frequency in hertz.
  */
 /* cppcheck-suppress misra-c2012-2.5 */
-#define TCB0_CLOCK_FREQ (62500UL)
+#define TCB0_CLOCK_FREQ (16000000UL)
 
 /**
  * @ingroup tcb0

@@ -43,6 +43,7 @@ extern "C" {
 #include "../system/utils/compiler.h"
 #include "config_bits.h"
 #include "../system/pins.h"
+#include "../timer/rtc.h"
 #include "../uart/usart1.h"
 #include "../uart/usart2.h"
 #include "../system/interrupt.h"
@@ -50,8 +51,6 @@ extern "C" {
 #include "../spi/spi0.h"
 #include "../timer/tca0.h"
 #include "../timer/tcb0.h"
-#include "../timer/tcb1.h"
-#include "../timer/tcb2.h"
 /**
  * @ingroup systemdriver
  * @brief Initializes the System module. This routine is called only once during system initialization, before calling any other API.

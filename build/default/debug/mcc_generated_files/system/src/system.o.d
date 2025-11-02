@@ -33,6 +33,8 @@ build/default/debug/mcc_generated_files/system/src/system.o.d \
  mcc_generated_files/system/src/../../system/pins.h \
  mcc_generated_files/system/src/../../system/./port.h \
  mcc_generated_files/system/src/../../system/./utils/compiler.h \
+ mcc_generated_files/system/src/../../timer/rtc.h \
+ mcc_generated_files/system/src/../../timer/../system/utils/compiler.h \
  mcc_generated_files/system/src/../../uart/usart1.h \
  mcc_generated_files/system/src/../../uart/../system/system.h \
  mcc_generated_files/system/src/../../uart/uart_drv_interface.h \
@@ -45,14 +47,9 @@ build/default/debug/mcc_generated_files/system/src/system.o.d \
  mcc_generated_files/system/src/../../spi/../system/utils/compiler.h \
  mcc_generated_files/system/src/../../spi/spi_interface.h \
  mcc_generated_files/system/src/../../timer/tca0.h \
- mcc_generated_files/system/src/../../timer/../system/utils/compiler.h \
  mcc_generated_files/system/src/../../timer/./tca0_deprecated.h \
  mcc_generated_files/system/src/../../timer/tcb0.h \
- mcc_generated_files/system/src/../../timer/tcb0_deprecated.h \
- mcc_generated_files/system/src/../../timer/tcb1.h \
- mcc_generated_files/system/src/../../timer/tcb1_deprecated.h \
- mcc_generated_files/system/src/../../timer/tcb2.h \
- mcc_generated_files/system/src/../../timer/tcb2_deprecated.h
+ mcc_generated_files/system/src/../../timer/tcb0_deprecated.h
 
 mcc_generated_files/system/src/../system.h:
 
@@ -118,6 +115,10 @@ mcc_generated_files/system/src/../../system/./port.h:
 
 mcc_generated_files/system/src/../../system/./utils/compiler.h:
 
+mcc_generated_files/system/src/../../timer/rtc.h:
+
+mcc_generated_files/system/src/../../timer/../system/utils/compiler.h:
+
 mcc_generated_files/system/src/../../uart/usart1.h:
 
 mcc_generated_files/system/src/../../uart/../system/system.h:
@@ -142,18 +143,8 @@ mcc_generated_files/system/src/../../spi/spi_interface.h:
 
 mcc_generated_files/system/src/../../timer/tca0.h:
 
-mcc_generated_files/system/src/../../timer/../system/utils/compiler.h:
-
 mcc_generated_files/system/src/../../timer/./tca0_deprecated.h:
 
 mcc_generated_files/system/src/../../timer/tcb0.h:
 
 mcc_generated_files/system/src/../../timer/tcb0_deprecated.h:
-
-mcc_generated_files/system/src/../../timer/tcb1.h:
-
-mcc_generated_files/system/src/../../timer/tcb1_deprecated.h:
-
-mcc_generated_files/system/src/../../timer/tcb2.h:
-
-mcc_generated_files/system/src/../../timer/tcb2_deprecated.h:

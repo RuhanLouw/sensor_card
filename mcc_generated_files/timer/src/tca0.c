@@ -96,7 +96,7 @@ void TCA0_Initialize(void)
         | (0 << TCA_SINGLE_CMP2_bp)   // CMP2 disabled
         | (0 << TCA_SINGLE_OVF_bp);  // OVF disabled
 
-    TCA0.SINGLE.PER = 0xB71AU;  // PER 0xB71A
+    TCA0.SINGLE.PER = 0xC34FU;  // PER 0xC34F
 
     TCA0.SINGLE.TEMP = 0x0;  // TEMP 0x0
 
@@ -228,6 +228,42 @@ void TCA0_InterruptDisable(void)
 	 				| (0 << TCA_SINGLE_CMP1_bp)     /* Compare 1 Interrupt: disabled */
 	 				| (0 << TCA_SINGLE_CMP2_bp)     /* Compare 2 Interrupt: disabled */
 	 				| (0 << TCA_SINGLE_OVF_bp);     /* Overflow Interrupt: disabled */
+}
+
+/* cppcheck-suppress misra-c2012-2.7 */
+/* cppcheck-suppress misra-c2012-8.2 */
+/* cppcheck-suppress misra-c2012-8.4 */
+ISR(TCA0_CMP0_vect)
+{
+     if(NULL != TCA0_CMP0Callback)
+    {
+        (*TCA0_CMP0Callback)();
+    }
+    TCA0.SINGLE.INTFLAGS = TCA_SINGLE_CMP0_bm;
+}
+
+/* cppcheck-suppress misra-c2012-2.7 */
+/* cppcheck-suppress misra-c2012-8.2 */
+/* cppcheck-suppress misra-c2012-8.4 */
+ISR(TCA0_CMP1_vect)
+{
+    if(NULL != TCA0_CMP1Callback)
+    {
+        (*TCA0_CMP1Callback)();
+    }
+    TCA0.SINGLE.INTFLAGS = TCA_SINGLE_CMP1_bm;
+}
+
+/* cppcheck-suppress misra-c2012-2.7 */
+/* cppcheck-suppress misra-c2012-8.2 */
+/* cppcheck-suppress misra-c2012-8.4 */
+ISR(TCA0_CMP2_vect)
+{
+    if(NULL != TCA0_CMP2Callback)
+    {
+        (*TCA0_CMP2Callback)();
+    }
+    TCA0.SINGLE.INTFLAGS = TCA_SINGLE_CMP2_bm;
 }
 
 /* cppcheck-suppress misra-c2012-2.7 */

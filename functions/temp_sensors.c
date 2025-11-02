@@ -6,11 +6,9 @@
 #include "math.h"
 #include "float.h"
 #define F_CPU 16000000UL
-#include <avr/delay.h>
+#include <util/delay.h>
 #include "debug_uart2.h"
 #include "../mcc_generated_files/timer/tcb0.h"
-#include "../mcc_generated_files/timer/tcb1.h"
-#include "../mcc_generated_files/timer/tcb2.h"
 
 char debug_buffer[64];
 KTYPE_STATE_t KTYPE_STATE = KTYPE_IDLE;
@@ -229,7 +227,7 @@ KTYPE_ERROR_t readKTypeSensor(float *thermo, float *junc) {
     // D[2] = short Vcc
     // D[1] = short GND
     // D[0] = open circuit
-    // power up time = 200ms
+    // power up time = 200ms // this should be taken into account!!!!!!!!! has not been implimented just yet!!!
     // convertion time = 70ms
 //    uint16_t thermoBuffer;
 //    bool fault;
@@ -290,7 +288,7 @@ KTYPE_ERROR_t readKTypeSensor(float *thermo, float *junc) {
     return KTYPE_OK; // Convert to °C × 10 (1000)
 }
 
-KTYPE_SENSOR_t read _ktype(void){
+KTYPE_SENSOR_t read_ktype(void){
     KTYPE_SENSOR_t buffer;
     float therm;
     float junc;

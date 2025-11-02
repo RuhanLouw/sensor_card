@@ -2,7 +2,7 @@
 
 manifest_file_version: 1.0.0
 project: Sensor_Controller
-creation_date: 2025-10-15T11:05:55.196+02:00[Africa/Harare]
+creation_date: 2025-11-01T21:31:58.044+02:00[Africa/Harare]
 operating_system: Windows 11
 mcc_mode: IDE
 mcc_mode_version: v6.25
@@ -10,7 +10,7 @@ device_name: AVR128DB32
 compiler: XC8 3.10
 mcc_version: 5.6.2
 mcc_core_version: 5.8.2
-content_manager_version: 6.0.2
+content_manager_version: 6.0.3
 is_mcc_offline: false
 is_using_prerelease_versions: false
 mcc_content_registries: https://registry.npmjs.org/
@@ -25,6 +25,7 @@ modules:
 - {name: '@mchp-mcc/pin-content-processor', type: MELODY, version: 3.10.0}
 - {name: '@mchp-mcc/scf-avr8-clkctrl-v3', type: MELODY, version: 2.0.10}
 - {name: '@mchp-mcc/scf-avr8-interrupt-v1', type: MELODY, version: 5.0.12}
+- {name: '@mchp-mcc/scf-avr8-rtc-v1', type: MELODY, version: 4.2.5}
 - {name: '@mchp-mcc/scf-avr8-spi-v1', type: MELODY, version: 5.1.0}
 - {name: '@mchp-mcc/scf-avr8-tca-v1', type: MELODY, version: 7.1.0}
 - {name: '@mchp-mcc/scf-avr8-tcb-v1', type: MELODY, version: 6.1.1}

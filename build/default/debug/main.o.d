@@ -34,6 +34,8 @@ build/default/debug/main.o.d build/default/debug/main.o: main.c \
  mcc_generated_files/system/../system/pins.h \
  mcc_generated_files/system/../system/./port.h \
  mcc_generated_files/system/../system/./utils/compiler.h \
+ mcc_generated_files/system/../timer/rtc.h \
+ mcc_generated_files/system/../timer/../system/utils/compiler.h \
  mcc_generated_files/system/../uart/usart1.h \
  mcc_generated_files/system/../uart/../system/system.h \
  mcc_generated_files/system/../uart/uart_drv_interface.h \
@@ -46,14 +48,9 @@ build/default/debug/main.o.d build/default/debug/main.o: main.c \
  mcc_generated_files/system/../spi/../system/utils/compiler.h \
  mcc_generated_files/system/../spi/spi_interface.h \
  mcc_generated_files/system/../timer/tca0.h \
- mcc_generated_files/system/../timer/../system/utils/compiler.h \
  mcc_generated_files/system/../timer/./tca0_deprecated.h \
  mcc_generated_files/system/../timer/tcb0.h \
  mcc_generated_files/system/../timer/tcb0_deprecated.h \
- mcc_generated_files/system/../timer/tcb1.h \
- mcc_generated_files/system/../timer/tcb1_deprecated.h \
- mcc_generated_files/system/../timer/tcb2.h \
- mcc_generated_files/system/../timer/tcb2_deprecated.h \
  functions/definitions.h functions/../mcc_generated_files/system/pins.h \
  functions/../mcc_generated_files/system/system.h \
  functions/temp_sensors.h functions/../mcc_generated_files/system/port.h \
@@ -131,6 +128,10 @@ mcc_generated_files/system/../system/./port.h:
 
 mcc_generated_files/system/../system/./utils/compiler.h:
 
+mcc_generated_files/system/../timer/rtc.h:
+
+mcc_generated_files/system/../timer/../system/utils/compiler.h:
+
 mcc_generated_files/system/../uart/usart1.h:
 
 mcc_generated_files/system/../uart/../system/system.h:
@@ -155,21 +156,11 @@ mcc_generated_files/system/../spi/spi_interface.h:
 
 mcc_generated_files/system/../timer/tca0.h:
 
-mcc_generated_files/system/../timer/../system/utils/compiler.h:
-
 mcc_generated_files/system/../timer/./tca0_deprecated.h:
 
 mcc_generated_files/system/../timer/tcb0.h:
 
 mcc_generated_files/system/../timer/tcb0_deprecated.h:
-
-mcc_generated_files/system/../timer/tcb1.h:
-
-mcc_generated_files/system/../timer/tcb1_deprecated.h:
-
-mcc_generated_files/system/../timer/tcb2.h:
-
-mcc_generated_files/system/../timer/tcb2_deprecated.h:
 
 functions/definitions.h:
 

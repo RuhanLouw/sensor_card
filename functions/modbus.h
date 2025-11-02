@@ -17,12 +17,12 @@ extern "C" {
 /* ============================================================
  * GLOBAL MODBUS REGISTER ARRAY
  * ============================================================ */
-#define MODBUS_REG_COUNT 128
+#define MODBUS_REG_COUNT 256
 
 void RS485_TX_ENABLE(void);
 void RS485_RX_ENABLE(void);
 void modbus_process(void);
-void modbus_receive(uint8_t data);
+void modbus_receive(void);
 void modbus_timer_expired(void);
 
 

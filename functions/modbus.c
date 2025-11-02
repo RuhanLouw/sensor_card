@@ -5,6 +5,7 @@
 #include "definitions.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include <util/delay.h>
 
 // Modbus slave address
 #define SLAVE_ADDRESS 2
@@ -23,6 +24,27 @@ static uint8_t rx_buffer[MAX_FRAME_SIZE];
 static uint8_t tx_buffer[MAX_FRAME_SIZE];
 static uint8_t rx_index = 0;
 static volatile bool frame_complete = false;
+
+
+typedef enum {
+    SLAVE_IDLE,
+    SLAVE_RX_IN_PROGRESS,
+    SLAVE_FRAME_COMPLETE,
+    SLAVE_TX_WAITING,
+    SLAVE_TX_IN_PROGRESS
+} mb_state_t;
+
+volatile mb_state_t slave_state = SLAVE_IDLE;
+volatile uint8_t frame_ready = 0;
+volatile uint8_t rx_buffer[256];
+volatile uint16_t rx_count = 0;
+
+void MB_Init(void){
+    UART1_RxCompleteCallbackRegister(modbus_receive);
+    UART1_TxCompleteCallbackRegister(modbus_timer_expired);
+    //UART1_TxCompleteCallbackRegister(mb_tx_complete); // Set back to RX
+    TCB0_CaptureCallbackRegister(modbus_timer_expired);
+}
 
 // RS485 RX/TX Select
 void RS485_TX_ENABLE(void){
@@ -57,8 +79,8 @@ void modbus_process(void) {
         frame_complete = false;
         return;
     }
-    
-    IO_PD4_Toggle();
+
+//    IO_PD4_Toggle();
     
     // Validate address and CRC
     uint16_t crc = modbus_crc16(rx_buffer, rx_index - 2);
@@ -71,18 +93,54 @@ void modbus_process(void) {
         return;
     }
 
+    /*=====================  
+     * MB Function CODES 
+      =====================*/
     switch(rx_buffer[1]){
         case FC_READ_INPUT_REGISTER: {
-            
-            
-            break;
-        }
-        case FC_READ_HOLDING_REGISTERS: {
+//            ERROR_LED_SET();
+
             uint16_t start_addr = (rx_buffer[2] << 8) | rx_buffer[3];
             uint16_t num_regs = (rx_buffer[4] << 8) | rx_buffer[5];
 
             // Validate request
             if (start_addr + num_regs <= MODBUS_REG_COUNT) {
+                // Build response: addr, func, byte count, data, CRC
+                tx_buffer[0] = SLAVE_ADDRESS;
+                tx_buffer[1] = FC_READ_INPUT_REGISTER;
+                tx_buffer[2] = num_regs * 2; // Byte count
+                for (uint16_t i = 0; i < num_regs; i++) {
+                    tx_buffer[3 + i * 2] = sys_regs[start_addr + i] >> 8; // High byte
+                    tx_buffer[4 + i * 2] = sys_regs[start_addr + i] & 0xFF; // Low byte
+                } 
+                crc = modbus_crc16(tx_buffer, 3 + num_regs * 2);
+                tx_buffer[3 + num_regs * 2] = crc & 0xFF;
+                tx_buffer[4 + num_regs * 2] = crc >> 8;
+
+                // Send response
+                TX1_LED_SET();
+                RS485_TX_ENABLE();
+                _delay_ms(4);
+                for (uint8_t i = 0; i < 5 + num_regs * 2; i++) {
+                    while (!UART1_IsTxReady());
+                    UART1_Write(tx_buffer[i]);
+                }
+                while (!UART1_IsTxDone());
+                _delay_us(100);
+                RS485_RX_ENABLE();
+                TX1_LED_nSET();
+            }   
+            break;
+        }
+        case FC_READ_HOLDING_REGISTERS: {
+            
+
+            uint16_t start_addr = (rx_buffer[2] << 8) | rx_buffer[3];
+            uint16_t num_regs = (rx_buffer[4] << 8) | rx_buffer[5];
+
+            // Validate request
+            if (start_addr + num_regs <= MODBUS_REG_COUNT) {
+                
                 // Build response: addr, func, byte count, data, CRC
                 tx_buffer[0] = SLAVE_ADDRESS;
                 tx_buffer[1] = FC_READ_HOLDING_REGISTERS;
@@ -95,34 +153,73 @@ void modbus_process(void) {
                 tx_buffer[3 + num_regs * 2] = crc & 0xFF;
                 tx_buffer[4 + num_regs * 2] = crc >> 8;
 
+                
+                // TODO: set tx wait timer and set tx buffer, then when tx wait interrupt -> send data!
+                ////////////////////////////////////////
                 // Send response
+                TX1_LED_SET();
                 RS485_TX_ENABLE();
+                _delay_ms(4);
                 for (uint8_t i = 0; i < 5 + num_regs * 2; i++) {
+                    
                     while (!UART1_IsTxReady());
                     UART1_Write(tx_buffer[i]);
+//                    ERROR_LED_SET();
                 }
                 while (!UART1_IsTxDone());
+                _delay_us(100);
                 RS485_RX_ENABLE();
-                
+                TX1_LED_nSET();
+                ///////////////////////////////////////
             }   
             break;
         }
         case FC_WRITE_MULTIPLE_REGISTERS: {
-            // todo
             
+            uint16_t start_address = (rx_buffer[2] << 8) | rx_buffer[3];
+            uint16_t num_regs = (rx_buffer[4] <<8) | rx_buffer[5];
+            
+            if (start_address + num_regs <= MODBUS_REG_COUNT){
+                
+                // --- write registers ---
+                uint16_t content;
+                for (uint8_t i=0; i < num_regs; i++){
+                    content = (rx_buffer[7 + i*2] << 8) | rx_buffer[8 + i*2];
+                    sys_regs[start_address + i];
+                }
+                // --- Build Response ---
+                // Response: [Addr][FC][StartHi][StartLo][QtyHi][QtyLo][CRC16]
+                uint8_t response[8];
+                tx_buffer[0] = rx_buffer[0];                    // Slave Address
+                tx_buffer[1] = FC_WRITE_MULTIPLE_REGISTERS;     // Function Code
+                tx_buffer[2] = rx_buffer[2];                    // Start Address High
+                tx_buffer[3] = rx_buffer[3];                    // Start Address Low
+                tx_buffer[4] = rx_buffer[4];                    // Quantity High
+                tx_buffer[5] = rx_buffer[5];                    // Quantity Low            
+                
+                // Append CRC
+                uint16_t crc = modbus_crc16(response, 6);
+                response[6] = crc & 0xFF;         // CRC Low
+                response[7] = (crc >> 8) & 0xFF;  // CRC High
+                
+                // --- Send response ---
+                TX1_LED_SET();
+                RS485_TX_ENABLE();
+                _delay_ms(4);
+                for (uint8_t i = 0; i < 5 + num_regs * 2; i++) {                    
+                    while (!UART1_IsTxReady());
+                    UART1_Write(tx_buffer[i]);
+//                  ERROR_LED_SET();
+                }
+                while (!UART1_IsTxDone());
+                _delay_us(100);
+                RS485_RX_ENABLE();
+                TX1_LED_nSET();
+            }
             
             break;
         }
     }//switch(rxbuffer[1])
-    
-    // Handle function code 03
-    if (rx_buffer[1] == FC_READ_HOLDING_REGISTERS) {
-
-    }
-    
-    // Handle other MODBUS function
-    // Function code -> to be written into sensor card
-    
     
 
     rx_index = 0;
@@ -130,24 +227,30 @@ void modbus_process(void) {
 }
 
 // Receive interrupt handler
-void modbus_receive(uint8_t data) {
-    MEASURE_LED_SET();
+void modbus_receive(void) {
     if (rx_index < MAX_FRAME_SIZE) {
-        rx_buffer[rx_ndex++] = data;
+        RX1_LED_SET();
+        rx_buffer[rx_index++] = UART1_Read();
         // Reset timer on each byte
-        TCB0_CNT = 0; // Reset counter
+        TCB0.CNT = 0; // Reset counter
         TCB0_CAPTInterruptEnable(); // Enable interrupt
+        slave_state = SLAVE_RX_IN_PROGRESS;
+        
     } else {
         rx_index = 0; // Overflow, reset
         frame_complete = false;
-    }
-    
+    }  
 }
 
 // Timer interrupt handler (called when 4ms silence detected)
 // Added to tcb0.c DefaultInteruptHandler
 void modbus_timer_expired(void) {
-    frame_complete = true;
-    TCB0_CAPTInterruptDisable(); // Disable until next byte
-    
+//    TX1_LED_SET();
+    if(slave_state == SLAVE_RX_IN_PROGRESS){
+        frame_complete = true;
+        slave_state = SLAVE_TX_WAITING;
+        RX1_LED_nSET();
+    }
+
+    TCB0_CAPTInterruptDisable(); // Disable until next byte    
 }

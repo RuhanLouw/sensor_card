@@ -34,6 +34,8 @@ build/default/debug/functions/debug_uart2.o.d \
  functions/../mcc_generated_files/uart/../system/../system/pins.h \
  functions/../mcc_generated_files/uart/../system/../system/./port.h \
  functions/../mcc_generated_files/uart/../system/../system/./utils/compiler.h \
+ functions/../mcc_generated_files/uart/../system/../timer/rtc.h \
+ c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\compiler.h \
  functions/../mcc_generated_files/uart/../system/../uart/usart1.h \
  c:\mplabxide\sensor_controller.x\mcc_generated_files\system\system.h \
  functions/../mcc_generated_files/uart/../system/../uart/uart_drv_interface.h \
@@ -45,14 +47,9 @@ build/default/debug/functions/debug_uart2.o.d \
  c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\compiler.h \
  functions/../mcc_generated_files/uart/../system/../spi/spi_interface.h \
  functions/../mcc_generated_files/uart/../system/../timer/tca0.h \
- c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\compiler.h \
  functions/../mcc_generated_files/uart/../system/../timer/./tca0_deprecated.h \
  functions/../mcc_generated_files/uart/../system/../timer/tcb0.h \
  functions/../mcc_generated_files/uart/../system/../timer/tcb0_deprecated.h \
- functions/../mcc_generated_files/uart/../system/../timer/tcb1.h \
- functions/../mcc_generated_files/uart/../system/../timer/tcb1_deprecated.h \
- functions/../mcc_generated_files/uart/../system/../timer/tcb2.h \
- functions/../mcc_generated_files/uart/../system/../timer/tcb2_deprecated.h \
  functions/../mcc_generated_files/uart/uart_drv_interface.h \
  functions/../mcc_generated_files/uart/usart1.h \
  functions/system_registers.h functions/debug_uart2.h \
@@ -127,6 +124,10 @@ functions/../mcc_generated_files/uart/../system/../system/./port.h:
 
 functions/../mcc_generated_files/uart/../system/../system/./utils/compiler.h:
 
+functions/../mcc_generated_files/uart/../system/../timer/rtc.h:
+
+c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\compiler.h:
+
 functions/../mcc_generated_files/uart/../system/../uart/usart1.h:
 
 c:\mplabxide\sensor_controller.x\mcc_generated_files\system\system.h:
@@ -149,21 +150,11 @@ functions/../mcc_generated_files/uart/../system/../spi/spi_interface.h:
 
 functions/../mcc_generated_files/uart/../system/../timer/tca0.h:
 
-c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\compiler.h:
-
 functions/../mcc_generated_files/uart/../system/../timer/./tca0_deprecated.h:
 
 functions/../mcc_generated_files/uart/../system/../timer/tcb0.h:
 
 functions/../mcc_generated_files/uart/../system/../timer/tcb0_deprecated.h:
-
-functions/../mcc_generated_files/uart/../system/../timer/tcb1.h:
-
-functions/../mcc_generated_files/uart/../system/../timer/tcb1_deprecated.h:
-
-functions/../mcc_generated_files/uart/../system/../timer/tcb2.h:
-
-functions/../mcc_generated_files/uart/../system/../timer/tcb2_deprecated.h:
 
 functions/../mcc_generated_files/uart/uart_drv_interface.h:
 

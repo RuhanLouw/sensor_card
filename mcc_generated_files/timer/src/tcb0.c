@@ -34,7 +34,6 @@
 */
 
 #include "../tcb0.h"
-#include "../../../functions/modbus.h"
 
 
 /**
@@ -52,7 +51,7 @@ void TCB0_Initialize(void)
     TCB0.CTRLB = (0 << TCB_ASYNC_bp)   // ASYNC disabled
         | (0 << TCB_CCMPEN_bp)   // CCMPEN disabled
         | (0 << TCB_CCMPINIT_bp)   // CCMPINIT disabled
-        | (TCB_CNTMODE_TIMEOUT_gc);  // CNTMODE TIMEOUT
+        | (TCB_CNTMODE_INT_gc);  // CNTMODE INT
 
     TCB0.DBGCTRL = (0 << TCB_DBGRUN_bp);  // DBGRUN disabled
 
@@ -60,7 +59,7 @@ void TCB0_Initialize(void)
         | (0 << TCB_EDGE_bp)   // EDGE disabled
         | (0 << TCB_FILTER_bp);  // FILTER disabled
 
-    TCB0.CCMP = 0xFAU;  // CCMP 0xFA
+    TCB0.CCMP = 0xFA00U;  // CCMP 0xFA00
 
     TCB0.CNT = 0x0;  // CNT 0xNAN
 
@@ -76,7 +75,7 @@ void TCB0_Initialize(void)
         | (0 << TCB_OVF_bp);  // OVF disabled
 
     TCB0.CTRLA = (0 << TCB_CASCADE_bp)   // CASCADE disabled
-        | (TCB_CLKSEL_TCA0_gc)   // CLKSEL TCA0
+        | (TCB_CLKSEL_DIV1_gc)   // CLKSEL DIV1
         | (1 << TCB_ENABLE_bp)   // ENABLE enabled
         | (0 << TCB_RUNSTDBY_bp)   // RUNSTDBY disabled
         | (0 << TCB_SYNCUPD_bp);  // SYNCUPD disabled
@@ -197,7 +196,6 @@ static void TCB0_DefaultCaptureCallback(void)
 {
     //Add your Capture interrupt code here or
     //Use TCB0_CaptureCallbackRegister function to use Custom ISR
-    modbus_timer_expired();
 }
 
 /* cppcheck-suppress misra-c2012-2.7 */

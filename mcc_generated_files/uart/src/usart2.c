@@ -41,6 +41,12 @@
   Section: Macro Declarations
 */
 
+#define USART2_TX_BUFFER_SIZE (256U) //buffer size should be 2^n
+#define USART2_TX_BUFFER_MASK (USART2_TX_BUFFER_SIZE - 1U) 
+
+#define USART2_RX_BUFFER_SIZE (256U) //buffer size should be 2^n
+#define USART2_RX_BUFFER_MASK (USART2_RX_BUFFER_SIZE - 1U)
+
 
 
 /**
@@ -65,8 +71,8 @@ const uart_drv_interface_t UART2 = {
     .BaudRateGet = NULL,
     .AutoBaudEventEnableGet = NULL,
     .ErrorGet = &USART2_ErrorGet,
-    .TxCompleteCallbackRegister = NULL,
-    .RxCompleteCallbackRegister = NULL,
+    .TxCompleteCallbackRegister = &USART2_TxCompleteCallbackRegister,
+    .RxCompleteCallbackRegister = &USART2_RxCompleteCallbackRegister,
     .TxCollisionCallbackRegister = NULL,
     .FramingErrorCallbackRegister = &USART2_FramingErrorCallbackRegister,
     .OverrunErrorCallbackRegister = &USART2_OverrunErrorCallbackRegister,
@@ -77,6 +83,21 @@ const uart_drv_interface_t UART2 = {
 /**
   Section: USART2 variables
 */
+static volatile uint16_t usart2TxHead = 0;
+static volatile uint16_t usart2TxTail = 0;
+static volatile uint16_t usart2TxBufferRemaining;
+static volatile uint8_t usart2TxBuffer[USART2_TX_BUFFER_SIZE];
+static volatile bool usart2IsTxComplete;
+static volatile uint16_t usart2RxHead = 0;
+static volatile uint16_t usart2RxTail = 0;
+static volatile uint16_t usart2RxCount;
+static volatile uint8_t usart2RxBuffer[USART2_RX_BUFFER_SIZE];
+/**
+ * @misradeviation{@advisory,19.2}
+ * The UART error status necessitates checking the bit field and accessing the status within the group byte therefore the use of a union is essential.
+ */
+  /* cppcheck-suppress misra-c2012-19.2 */
+static volatile usart2_status_t usart2RxStatusBuffer[USART2_RX_BUFFER_SIZE];
  /* cppcheck-suppress misra-c2012-19.2 */
 static volatile usart2_status_t usart2RxLastError;
 
@@ -86,10 +107,17 @@ static volatile usart2_status_t usart2RxLastError;
 static void (*USART2_FramingErrorHandler)(void);
 static void (*USART2_OverrunErrorHandler)(void);
 static void (*USART2_ParityErrorHandler)(void);
+void (*USART2_TxInterruptHandler)(void);
+/* cppcheck-suppress misra-c2012-8.9 */
+static void (*USART2_TxCompleteInterruptHandler)(void) = NULL;
+void (*USART2_RxInterruptHandler)(void);
+static void (*USART2_RxCompleteInterruptHandler)(void) = NULL;
 
 static void USART2_DefaultFramingErrorCallback(void);
 static void USART2_DefaultOverrunErrorCallback(void);
 static void USART2_DefaultParityErrorCallback(void);
+void USART2_TransmitISR (void);
+void USART2_ReceiveISR(void);
 
 
 
@@ -130,13 +158,16 @@ int putchar (int outChar)
 
 void USART2_Initialize(void)
 {
+    USART2_RxInterruptHandler = USART2_ReceiveISR;  
+    USART2_TxInterruptHandler = USART2_TransmitISR;
+
     // Set the USART2 module to the options selected in the user interface.
 
     //BAUD 6666; 
     USART2.BAUD = (uint16_t)USART2_BAUD_RATE(9600UL);
 	
-    // ABEIE disabled; DREIE disabled; LBME disabled; RS485 DISABLE; RXCIE disabled; RXSIE disabled; TXCIE disabled; 
-    USART2.CTRLA = 0x0;
+    // ABEIE disabled; DREIE disabled; LBME disabled; RS485 DISABLE; RXCIE enabled; RXSIE enabled; TXCIE enabled; 
+    USART2.CTRLA = 0xD0;
 	
     // MPCM disabled; ODME disabled; RXEN enabled; RXMODE NORMAL; SFDEN disabled; TXEN enabled; 
     USART2.CTRLB = 0xC0;
@@ -160,6 +191,15 @@ void USART2_Initialize(void)
     USART2_OverrunErrorCallbackRegister(USART2_DefaultOverrunErrorCallback);
     USART2_ParityErrorCallbackRegister(USART2_DefaultParityErrorCallback);
     usart2RxLastError.status = 0;  
+    usart2TxHead = 0;
+    usart2TxTail = 0;
+    usart2TxBufferRemaining = sizeof(usart2TxBuffer);
+    usart2IsTxComplete = true;
+    usart2RxHead = 0;
+    usart2RxTail = 0;
+    usart2RxCount = 0;
+    USART2.CTRLA |= USART_RXCIE_bm; 
+
 #if defined(__GNUC__)
     stdout = &USART2_stream;
 #endif
@@ -167,6 +207,8 @@ void USART2_Initialize(void)
 
 void USART2_Deinitialize(void)
 {
+    USART2.CTRLA &= ~(USART_RXCIE_bm);    
+    USART2.CTRLA &= ~(USART_DREIE_bm);  
     USART2.BAUD = 0x00;	
     USART2.CTRLA = 0x00;	
     USART2.CTRLB = 0x00;	
@@ -244,34 +286,91 @@ void USART2_AutoBaudDetectErrorReset(void)
     USART2_AutoBaudSet(true);
 }
 
+void USART2_TransmitInterruptEnable(void)
+{
+    USART2.CTRLA |= USART_DREIE_bm ; 
+}
+
+void USART2_TransmitInterruptDisable(void)
+{ 
+    USART2.CTRLA &= ~(USART_DREIE_bm); 
+}
+
+void USART2_ReceiveInterruptEnable(void)
+{
+    USART2.CTRLA |= USART_RXCIE_bm ; 
+}
+void USART2_ReceiveInterruptDisable(void)
+{
+    USART2.CTRLA &= ~(USART_RXCIE_bm); 
+}
+
 bool USART2_IsRxReady(void)
 {
-    return (bool)(USART2.STATUS & USART_RXCIF_bm);
+    return (usart2RxCount ? true : false);
 }
 
 bool USART2_IsTxReady(void)
 {
-    return (bool)(USART2.STATUS & USART_DREIF_bm);
+    return (usart2TxBufferRemaining ? true : false);
 }
 
 bool USART2_IsTxDone(void)
 {
     bool usart2TxCompleteStatus = false;
-    usart2TxCompleteStatus = (bool)(USART2.STATUS & USART_TXCIF_bm);
+    usart2TxCompleteStatus = usart2IsTxComplete;
+    usart2IsTxComplete = false;
     return usart2TxCompleteStatus;
 }
 
 size_t USART2_ErrorGet(void)
 {
-    usart2RxLastError.status = 0;
+    usart2RxLastError.status = usart2RxStatusBuffer[usart2RxTail & USART2_RX_BUFFER_MASK].status;
+    return usart2RxLastError.status;
+}
+
+uint8_t USART2_Read(void)
+{
+    uint8_t readValue  = 0;
+    uint16_t tempRxTail;
     
+    readValue = usart2RxBuffer[usart2RxTail];
+    tempRxTail = (usart2RxTail + 1U) & USART2_RX_BUFFER_MASK; // Buffer size of RX should be in the 2^n  
+    usart2RxTail = tempRxTail;
+    USART2.CTRLA &= ~(USART_RXCIE_bm); 
+    if(0U != usart2RxCount)
+    {
+        usart2RxCount--;
+    }
+    USART2.CTRLA |= USART_RXCIE_bm; 
+
+
+    return readValue;
+}
+
+/* Interrupt service routine for RX complete */
+/* cppcheck-suppress misra-c2012-2.7 */
+/* cppcheck-suppress misra-c2012-8.4 */
+ISR(USART2_RXC_vect)
+/* cppcheck-suppress misra-c2012-5.5 */
+{
+    USART2_RxInterruptHandler();
+}
+
+void USART2_ReceiveISR(void)
+{
+    uint8_t regValue;
+    uint16_t tempRxHead;
+    
+    usart2RxStatusBuffer[usart2RxHead].status = 0;
+
     if(USART_FERR_bm == (USART2.RXDATAH & USART_FERR_bm))
     {
-        usart2RxLastError.ferr = 1;
+        usart2RxStatusBuffer[usart2RxHead].ferr = 1;
         if(NULL != USART2_FramingErrorHandler)
         {
             USART2_FramingErrorHandler();
-        }  
+        } 
     }
     if(USART_PERR_bm == (USART2.RXDATAH & USART_PERR_bm))
     {
@@ -283,25 +382,104 @@ size_t USART2_ErrorGet(void)
     }
     if(USART_BUFOVF_bm == (USART2.RXDATAH & USART_BUFOVF_bm))
     {
-        usart2RxLastError.oerr = 1;
+        usart2RxStatusBuffer[usart2RxHead].oerr = 1;
         if(NULL != USART2_OverrunErrorHandler)
         {
             USART2_OverrunErrorHandler();
         }   
+    }    
+    
+    regValue = USART2.RXDATAL;
+    
+    tempRxHead = (usart2RxHead + 1U) & USART2_RX_BUFFER_MASK;// Buffer size of RX should be in the 2^n
+    if (tempRxHead == usart2RxTail) {
+		// ERROR! Receive buffer overflow 
+	} 
+    else
+    {
+        // Store received data in buffer 
+		usart2RxBuffer[usart2RxHead] = regValue;
+		usart2RxHead = tempRxHead;
+
+		usart2RxCount++;
+	}
+    if (NULL != USART2_RxCompleteInterruptHandler)
+    {
+        (*USART2_RxCompleteInterruptHandler)();
     }
-    return usart2RxLastError.status;
+    
+    else {
+        // Do Nothing. Added for MISRA C Compliant.
+    }
 }
-
-uint8_t USART2_Read(void)
-{
-    return USART2.RXDATAL;
-}
-
 
 void USART2_Write(uint8_t txData)
 {
-    USART2.TXDATAL = txData;    // Write the data byte to the USART.
+    uint16_t tempTxHead;
+    
+    if(0U < usart2TxBufferRemaining) // check if at least one byte place is available in TX buffer
+    {
+       usart2TxBuffer[usart2TxHead] = txData;
+       tempTxHead = (usart2TxHead + 1U) & USART2_TX_BUFFER_MASK;// Buffer size of TX should be in the 2^n
+       
+       usart2TxHead = tempTxHead;
+       USART2.CTRLA &= ~(USART_DREIE_bm);  //Critical value decrement
+       usart2TxBufferRemaining--;  // one less byte remaining in TX buffer
+    }
+    else
+    {
+        //overflow condition; TX buffer is full
+    }
+
+    USART2.CTRLA |= USART_DREIE_bm;  
 }
+
+/* Interrupt service routine for Data Register Empty */
+/* cppcheck-suppress misra-c2012-2.7 */
+/* cppcheck-suppress misra-c2012-8.4 */
+ISR(USART2_DRE_vect)
+/* cppcheck-suppress misra-c2012-5.5 */
+{
+    USART2_TxInterruptHandler();
+}
+
+/* Interrupt service routine for shift register and data register empty */
+/* cppcheck-suppress misra-c2012-2.7 */
+/* cppcheck-suppress misra-c2012-8.4 */
+ISR(USART2_TXC_vect)
+/* cppcheck-suppress misra-c2012-5.5 */
+{
+    usart2IsTxComplete = (bool)(USART2.STATUS & USART_TXCIF_bm);
+
+    if (NULL != USART2_TxCompleteInterruptHandler)
+    {
+        (*USART2_TxCompleteInterruptHandler)();
+    }
+
+    USART2.STATUS |= USART_TXCIF_bm;
+}
+
+void USART2_TransmitISR(void)
+{
+    uint16_t tempTxTail;
+
+    // use this default transmit interrupt handler code
+    if(sizeof(usart2TxBuffer) > usart2TxBufferRemaining) // check if all data is transmitted
+    {
+       USART2.TXDATAL = usart2TxBuffer[usart2TxTail];
+
+       tempTxTail = (usart2TxTail + 1U) & USART2_TX_BUFFER_MASK;// Buffer size of TX should be in the 2^n
+       
+       usart2TxTail = tempTxTail;
+
+       usart2TxBufferRemaining++; // one byte sent, so 1 more byte place is available in TX buffer
+    }
+    else
+    {
+        USART2.CTRLA &= ~(USART_DREIE_bm); 
+    }
+}
+
 static void USART2_DefaultFramingErrorCallback(void)
 {
     
@@ -341,6 +519,20 @@ void USART2_ParityErrorCallbackRegister(void (* callbackHandler)(void))
     } 
 }
 
+void USART2_RxCompleteCallbackRegister(void (* callbackHandler)(void))
+{
+    if(NULL != callbackHandler)
+    {
+       USART2_RxCompleteInterruptHandler = callbackHandler; 
+    }   
+}
 
+void USART2_TxCompleteCallbackRegister(void (* callbackHandler)(void))
+{
+    if(NULL != callbackHandler)
+    {
+       USART2_TxCompleteInterruptHandler = callbackHandler;
+    }   
+}
 
 
