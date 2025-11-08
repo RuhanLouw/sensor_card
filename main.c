@@ -38,11 +38,12 @@
 #include "functions/definitions.h"
 #include "functions/temp_sensors.h"
 //#include "functions/system_cmd.h"
-#include "functions/ds18b20.h"
+//#include "functions/ds18b20.h"
+#include "DS.h"
 #include "functions/debug_uart2.h"
 #include "functions/system_registers.h"
 #include "functions/modbus.h"
-
+#include <stdio.h>
 /*
     Main application
 */
@@ -57,40 +58,41 @@ typedef struct {
     NTC_SENSOR_t ntcs[8];
     KTYPE_SENSOR_t ktype;
     DHT22_SENSOR_t dht22;
-    DS18B20_SENSOR_t ds18b20[2];
+    DS_SENSOR_t ds18b20[2];
 }SYS_SENSORS;
 
 // System Sensors Registers
 SYS_SENSORS sys_sensors;
 
 /* ============================================================
- * FUNCTION: INITIALISE SYSTEM REGISTERS
+ * FUNCTION: INITIALISE SYSTEM REGISTERS AND SENSORS
  * ============================================================ */
-void SYS_REGS_INIT(void){   
+void _SYS_INIT(void){   
     // System info registers
     sys_regs[MB_REG_FIRMWARE_VERSION] = 100; // v1.00
     sys_regs[MB_REG_UPTIME_LSW] = 2;         // To be filled from timer
     sys_regs[MB_REG_UPTIME_MSW] = 3;
     
     // --- SET ---
-    sys_regs[MB_REG_SYSTEM_STATUS] = SYS_STAT_SYSTEM_READY;
+    sys_regs[MB_REG_SYSTEM_STATUS] = SYS_STAT_SENSOR_POLL_ACTIVE | SYS_STAT_SYSTEM_READY;
     sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] = (
-                EN_FLAG_NTC1
-            |   EN_FLAG_NTC2
-            |   EN_FLAG_NTC3
-            |   EN_FLAG_NTC4
-            |   EN_FLAG_NTC5
+//                  EN_FLAG_NTC1
+//            |   EN_FLAG_NTC2
+//            |   EN_FLAG_NTC3
+//            |   EN_FLAG_NTC4
+               EN_FLAG_NTC5
             |   EN_FLAG_NTC6
-            |   EN_FLAG_NTC7
-            |   EN_FLAG_NTC8
-            |   EN_FLAG_KTYPE   
-//          |   EN_FLAG_DHT22
-//          |   EN_FLAG_DS18B20_1
-//          |   EN_FLAG_DS18B20_2
+//            |   EN_FLAG_NTC7
+//            |   EN_FLAG_NTC8
+//            |   EN_FLAG_KTYPE   
+//            |   EN_FLAG_DHT22
+            |   EN_FLAG_DS18B20_1
+//            |   EN_FLAG_DS18B20_2
             );
     
-    // --- NOT SET ---
-    sys_regs[MB_REG_SYSTEM_STATUS] &= ~SYS_STAT_SENSOR_POLL_ACTIVE;
+//    MB_Init();    
+    KTYPE_Init();
+    
 }
 
 /* ============================================================
@@ -115,9 +117,9 @@ void update_sensor_registers(void) {
     sys_regs[MB_REG_DHT22_ERROR] = sys_sensors.dht22.error;
 
     // DS18B20
-    for (int i = 0; i < 2; i++) {
+    for (uint8_t i = 0; i < 2; i++) {
         sys_regs[MB_REG_DS18B20_1_TEMP + i] = sys_sensors.ds18b20[i].temp;
-        sys_regs[MB_REG_DS18B20_ERROR] = sys_sensors.ds18b20[i].error;
+        sys_regs[MB_REG_DS18B20_1_ERROR + i] = sys_sensors.ds18b20[i].error;
     }
 }
 
@@ -125,121 +127,91 @@ void update_sensor_registers(void) {
  * FUNCTION: Update Sensor Data 
  * ============================================================ */
 void poll_sensors(void) {
-    MEASURE_LED_SET();
-    if(sys_regs[MB_REG_COMMAND] & SYS_STAT_SENSOR_POLL_ACTIVE){
-        // NTC Poll
-        
-        for(uint8_t i=0; i<8; i++){
-            if(sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & (EN_FLAG_NTC1 << i)){
-                sys_sensors.ntcs[i] = read_ntc(i, ntc_samples); 
+    if(sys_regs[MB_REG_SYSTEM_STATUS] & SYS_STAT_SENSOR_POLL_ACTIVE){
+        MEASURE_LED_SET();
+        //NTC Poll
+        for(uint8_t i=1; i<=8; i++){
+            if( sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && (EN_FLAG_NTC1 << (i-1)) ){
+                sys_sensors.ntcs[i-1] = read_ntc(i, ntc_samples);
             }
         }
         // KTYPE Poll
         if(KTYPE_check_state() == KTYPE_READ_READY &&
-                (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & EN_FLAG_KTYPE)){
+                (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && EN_FLAG_KTYPE)){
             sys_sensors.ktype = read_ktype(); 
         }
-        // DS18B201 Poll
-        if(DS18B201_check_state() == DS18B20_STATE_READY &&
-                (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & EN_FLAG_DS18B20_1)) {
-            sys_sensors.ds18b20[0] = read_ds18b20(0);
+        // DS 1 Poll
+        if ((DS_Check_State(1) == DS_READY) & (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && EN_FLAG_DS18B20_1)) {
+                sys_sensors.ds18b20[0] = DS_Read(1);
         }
-        // DS18B202 Poll
-        if(DS18B202_check_state() == DS18B20_STATE_READY &&
-                (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & EN_FLAG_DS18B20_2)){
-            sys_sensors.ds18b20[1] = read_ds18b20(1);
+        //DS 2 Poll
+        if ((DS_Check_State(2) == DS_READY) & (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && EN_FLAG_DS18B20_2)) {
+                sys_sensors.ds18b20[1] = DS_Read(2);
         }
-        // DHT22 Poll
-//        if(DHT22_STATE == DHT22_READ_READY &&
-//                 (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & EN_FLAG_KTYPE)){
-//            sys_sensors.dht22 = read_dht22();
-//        }
+//    // DHT22 Poll
+//    if(DHT22_STATE == DHT22_READ_READY &&
+//             (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & EN_FLAG_KTYPE)){
+//        sys_sensors.dht22 = read_dht22();
+//    }
+
+    MEASURE_LED_nSET();
+    update_sensor_registers();
     
-        // After polling, update the Modbus register array
-        MEASURE_LED_nSET();
-        update_sensor_registers();
-    
-    }
+    } 
 }
-
-/* ============================================================
- * MODBUS READ/WRITE HANDLERS
- * ============================================================ */
-//uint16_t modbus_read_register(uint16_t reg_addr) {
-//    if (reg_addr < MODBUS_REG_COUNT) {
-//        return modbus_regs[reg_addr];
-//    }
-//    return 0;
-//}
-//
-//void modbus_write_register(uint16_t reg_addr, uint16_t value) {
-//    if (reg_addr < MODBUS_REG_COUNT) {
-//        modbus_regs[reg_addr] = value;
-//
-//        // If writing to command or config registers, update structs
-//        if (reg_addr == MB_REG_COMMAND) {
-//            if (value & CMD_SYS_RESET) {
-//                // handle system reset
-//            }
-//            if (value & CMD_FORCE_REFRESH) {
-//                poll_sensors();
-//            }
-//        } else if (reg_addr == MB_REG_LOG_INTERVAL) {
-//            // update logging interval
-//        }
-//    }
-//}
-
-/* ============================================================
- * INTERRUPT SERVISE
- * ============================================================ */
-//ISR(USART1_RXC_vect)
-//{
-//    uint8_t byte = USART1.RXDATAL; // read received byte
-//    modbus_receive(byte);           // send to your own handler
-//}
-
-// System registers init:
+    
 
 /* ============================================================= */
-
-
-/* ============================================================
+/* =============================================================
  * MAIN LOOP
- * ============================================================ */
+ * ============================================================= */
+/* ============================================================= */
 int main(void) {
     SYSTEM_Initialize();
-//    TCB0_CAPTInterruptEnable();
-//    SYS_REGS_INIT();
-    sys_regs[0] = 0x1234;
-    sys_regs[1] = 0x5678;
-    // Initialize hardware, timers, RS485, etc.
+    sei();
+    TCB0_Stop();
+    TCB1_Start();
+    TCB2_Stop();
+    _SYS_INIT();
+    
+
+    RS485_RX_ENABLE();
+    char debug_buffer[256] = {0};
     RUN_LED_SET();
-    /*Init Functions*/
-//    Init_sensors();
-//    KTYPE_start_conversion();
-
+    /////////////////////
+    
     while (1) {
+        
+        
         poll_sensors(); // update sensor structs and registers
-        modbus_process(); // Handle Modbus requests from control card
-        
-        _delay_ms(50); // adjust polling rate
+//        modbus_process(); // Handle Modbus requests from control card
 
+        sprintf(debug_buffer, "NTC5: %d\nNTC6: %d\nDS1: %d ERROR: %d\n\n",
+                (int)sys_regs[MB_REG_NTC5_TEMP],
+                (int)sys_regs[MB_REG_NTC6_TEMP],
+                (int)sys_regs[MB_REG_DS18B20_1_TEMP],
+                (int)sys_regs[MB_REG_DS18B20_1_ERROR]);
         
-//        buffer = read_ktype();
-//        sprintf(debug1, "RS485 Received\n");
-//        debug1_send_string(debug1);
-//        char debug1[64];
-//        sprintf(debug1, "Temp: %d, Junc: %d, Err: %d \n", 
-//                (int)buffer.temp, 
-//                (int)buffer.cold_junction,
-//                (int)buffer.error
-//                );
-//        debug1_send_string(debug1);
+        debug1_send_string(debug_buffer);
+        _delay_ms(500); // adjust polling rate
     }
 }
    
-
+//        sprintf(debug_buffer, "NTC1: %d\nNTC2: %d\nNTC3: %d\nNTC4: %d\nNTC5: %d\nNTC6: %d\nNTC7: %d\nNTC8: %d\nKTYPE: %d\nKTYPE_jc: %d\nDS1: %d\nDS2 %d\n\n",
+//                (int)sys_regs[MB_REG_NTC1_TEMP],
+//                (int)sys_regs[MB_REG_NTC2_TEMP],
+//                (int)sys_regs[MB_REG_NTC3_TEMP],
+//                (int)sys_regs[MB_REG_NTC4_TEMP],
+//                (int)sys_regs[MB_REG_NTC5_TEMP],
+//                (int)sys_regs[MB_REG_NTC6_TEMP],
+//                (int)sys_regs[MB_REG_NTC7_TEMP],
+//                (int)sys_regs[MB_REG_NTC8_TEMP],
+//                (int)sys_regs[MB_REG_KTYPE_TEMP],
+//                (int)sys_regs[MB_REG_KTYPE_CJ_TEMP],
+//                (int)sys_regs[MB_REG_DS18B20_1_TEMP],
+//                (int)sys_regs[MB_REG_DS18B20_2_TEMP]);
+//        
+//        debug1_send_string(debug_buffer);
 
 
 

@@ -97,6 +97,7 @@ typedef struct {
 
 void tempSensors_init(void);
 void CS_NTC(uint8_t ntc_num);
+uint16_t mcp3201_read_bitbang(uint8_t ntc_num);
 uint16_t readRaw_NTC(uint8_t ntc_num);
 float readAvg_NTC(uint8_t ntc_num, uint8_t num_reads);
 float getTemp_NTC(uint8_t ntc_num, uint8_t num_reads);
@@ -110,6 +111,8 @@ KTYPE_STATE_t KTYPE_check_state(void);
 void KTYPE_bitbang(uint8_t *buffer);
 KTYPE_ERROR_t readKTypeSensor(float *thermo, float *junc);
 KTYPE_SENSOR_t read_ktype(void);
+void KTYPE_Init(void);
+
 void KTYPE_timer_CapCallBack(void);
 
 

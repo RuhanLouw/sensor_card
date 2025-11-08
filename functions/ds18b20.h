@@ -44,6 +44,10 @@ typedef struct {
 }DS18B20_SENSOR_t;
 
 // Function prototypes for Sensor 1 (PA3)
+
+
+void ds18b20_Init(void);
+
 void ds18b20_init_pin1(void);
 ds18b20_error_t ds18b20_reset1(void);
 void ds18b20_write_bit1(uint8_t bit);
@@ -51,7 +55,8 @@ uint8_t ds18b20_read_bit1(void);
 void ds18b20_write_byte1(uint8_t byte);
 uint8_t ds18b20_read_byte1(void);
 
-ds18b20_error_t ds18b20_start_conversion1(void);
+ds18b20_error_t ds18b20_start_conversion(void);
+
 ds18b20_state_t ds18b20_check_conversion1(void);
 ds18b20_error_t ds18b20_read_temp1(float *temp_celsius);
 
@@ -63,14 +68,15 @@ uint8_t ds18b20_read_bit2(void);
 void ds18b20_write_byte2(uint8_t byte);
 uint8_t ds18b20_read_byte2(void);
 
-ds18b20_error_t ds18b20_start_conversion2(void);
 ds18b20_state_t ds18b20_check_conversion2(void);
 ds18b20_error_t ds18b20_read_temp2(float *temp_celsius);
 
 // User Functions
 DS18B20_SENSOR_t read_ds18b20(uint8_t sensor_number);
-ds18b20_error_t DS18B201_check_state(void);
-ds18b20_error_t DS18B202_check_state(void);
+ds18b20_state_t DS18B201_check_state(void);
+ds18b20_state_t DS18B202_check_state(void);
+
+void ds18b20_CallbackRegister(void);
 
 #ifdef	__cplusplus
 }

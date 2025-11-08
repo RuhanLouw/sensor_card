@@ -4,31 +4,31 @@
 #define F_CPU 16000000UL
 #include <util/delay.h> // For _delay_us()
 #include "../mcc_generated_files/timer/tcb1.h"
+#include "definitions.h"
 // Conversion states
 static volatile ds18b20_state_t state1 = DS18B20_STATE_IDLE; // Sensor 1 (PA3)
 static volatile ds18b20_state_t state2 = DS18B20_STATE_IDLE; // Sensor 2 (PA4)
 
 // NOW USING TCB1
-// Initialize TCA0 for 750ms non-blocking delay
-static void ds18b20_init_timer(void) {
-//    TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV256_gc; // 16MHz / 256 = 16us/tick
-//    TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_NORMAL_gc; // Normal mode
-//    TCA0.SINGLE.PER = 46875; // 750ms / 16us = 46875
-//    TCA0.SINGLE.INTCTRL = TCA_SINGLE_OVF_bm; // Enable overflow interrupt
-//    TCA0.SINGLE.CNT = 0; // Reset counter
+// Initialize for 750ms non-blocking delay
+void ds18b20_CallbackRegister(void){
+    if (state1 == DS18B20_STATE_CONVERTING) state1 = DS18B20_STATE_READY;    
+    if (state2 == DS18B20_STATE_CONVERTING) state2 = DS18B20_STATE_READY;
+    TCB1.INTFLAGS = TCB_CAPT_bm;    // Clear flag
+//    TCB1_CAPTInterruptDisable();
+//    TCB1_Stop();
+//    TCB1_CounterSet(0);
+    ERROR_LED_TOGGLE();
 }
 
-//// TCA0 overflow interrupt: Set flags to READY
-//ISR(TCA0_OVF_vect) {
-//    if (state1 == DS18B20_STATE_CONVERTING) {
-//        state1 = DS18B20_STATE_READY;
-//    }
-//    if (state2 == DS18B20_STATE_CONVERTING) {
-//        state2 = DS18B20_STATE_READY;
-//    }
-//    TCA0.SINGLE.CTRLA &= ~TCA_SINGLE_ENABLE_bm; // Stop timer
-//    TCA0.SINGLE.INTFLAGS = TCA_SINGLE_OVF_bm; // Clear interrupt flag
-//}
+
+void ds18b20_Init(void) {
+    //TCB1
+    TCB1_CaptureCallbackRegister(ds18b20_CallbackRegister);
+    ds18b20_init_pin1();
+    ds18b20_init_pin2();
+//    TCB1_CAPTInterruptEnable();
+}
 
 // Initialize DS18B20 pins
 void ds18b20_init_pin1(void) {
@@ -43,7 +43,6 @@ void ds18b20_init_pin2(void) {
 
 // Reset for Sensor 1 (PA3)
 ds18b20_error_t ds18b20_reset1(void) {
-    ds18b20_init_pin1();
     DS18B20_PORT1.DIRSET = DS18B20_PIN1_bm; // Output
     DS18B20_PORT1.OUTCLR = DS18B20_PIN1_bm; // Low 480us
     _delay_us(480);
@@ -62,7 +61,6 @@ ds18b20_error_t ds18b20_reset1(void) {
 
 // Reset for Sensor 2 (PA4)
 ds18b20_error_t ds18b20_reset2(void) {
-    ds18b20_init_pin2();
     DS18B20_PORT2.DIRSET = DS18B20_PIN2_bm; // Output
     DS18B20_PORT2.OUTCLR = DS18B20_PIN2_bm; // Low 480us
     _delay_us(480);
@@ -114,11 +112,11 @@ uint8_t ds18b20_read_bit1(void) {
     uint8_t bit;
     DS18B20_PORT1.DIRSET = DS18B20_PIN1_bm; // Output
     DS18B20_PORT1.OUTCLR = DS18B20_PIN1_bm; // Low 6us
-    _delay_us(6);
+    _delay_us(3);
     DS18B20_PORT1.DIRCLR = DS18B20_PIN1_bm; // Input
-    _delay_us(9);
+    _delay_us(10);
     bit = (DS18B20_PORT1.IN & DS18B20_PIN1_bm) ? 1 : 0;
-    _delay_us(55); // Complete slot
+    _delay_us(47); // Complete slot
     return bit;
 }
 
@@ -127,11 +125,11 @@ uint8_t ds18b20_read_bit2(void) {
     uint8_t bit;
     DS18B20_PORT2.DIRSET = DS18B20_PIN2_bm; // Output
     DS18B20_PORT2.OUTCLR = DS18B20_PIN2_bm; // Low 6us
-    _delay_us(6);
+    _delay_us(3);
     DS18B20_PORT2.DIRCLR = DS18B20_PIN2_bm; // Input
-    _delay_us(9);
+    _delay_us(10);
     bit = (DS18B20_PORT2.IN & DS18B20_PIN2_bm) ? 1 : 0;
-    _delay_us(55); // Complete slot
+    _delay_us(47); // Complete slot
     return bit;
 }
 
@@ -185,18 +183,31 @@ static uint8_t ds18b20_crc8(const uint8_t *data, uint8_t len) {
     }
     return crc;
 }
-
 // Start conversion for Sensor 1 (PA3)
-ds18b20_error_t ds18b20_start_conversion1(void) {
-    if (state1 != DS18B20_STATE_IDLE) return DS18B20_TIMEOUT; // Busy
-    ds18b20_error_t status = ds18b20_reset1();
-    if (status != DS18B20_OK) return status;
-    ds18b20_write_byte1(0xCC); // Skip ROM
-    ds18b20_write_byte1(0x44); // Convert T
-    state1 = DS18B20_STATE_CONVERTING;
-    ds18b20_init_timer(); // Initialize TCA0
-    TCA0.SINGLE.CNT = 0; // Reset counter
-    TCA0.SINGLE.CTRLA |= TCA_SINGLE_ENABLE_bm; // Start timer
+ds18b20_error_t ds18b20_start_conversion(void) {
+    // Sensor 1
+    if (state1 == DS18B20_STATE_IDLE) {
+        if (ds18b20_reset1() == DS18B20_OK) {
+            ds18b20_write_byte1(0xCC);
+            ds18b20_write_byte1(0x44);
+            state1 = DS18B20_STATE_CONVERTING;
+        }
+    }
+    // Sensor 2
+    if (state2 == DS18B20_STATE_IDLE) {
+        if (ds18b20_reset2() == DS18B20_OK) {
+            ds18b20_write_byte2(0xCC);
+            ds18b20_write_byte2(0x44);
+            state2 = DS18B20_STATE_CONVERTING;
+        }
+    }
+    // Only start timer if at least one sensor is converting
+    if (state1 == DS18B20_STATE_CONVERTING || state2 == DS18B20_STATE_CONVERTING) {
+        TCB1_CounterSet(0);
+        TCB1_CAPTInterruptEnable();
+        TCB1_Start();
+    }
+
     return DS18B20_OK;
 }
 
@@ -259,23 +270,38 @@ DS18B20_SENSOR_t read_ds18b20(uint8_t sensor_number){
     DS18B20_SENSOR_t buffer;
     ds18b20_error_t ds18b20;
     float temp;
-    switch (sensor_number) {
-        case 1: ds18b20 = ds18b20_read_temp1(&temp);     
-        case 2: ds18b20 = ds18b20_read_temp2(&temp);
-    }
+switch (sensor_number) {
+    case 1: 
+        ds18b20 = ds18b20_read_temp1(&temp);
+        break;
+    case 2: 
+        ds18b20 = ds18b20_read_temp2(&temp);
+        break;
+    default:
+        buffer.error = DS18B20_NO_DEVICE;
+        ERROR_LED_SET();
+        return buffer;
+}
+
+//    TCB1_CAPTInterruptEnable();
+//    TCB1_CounterSet(0);
+//    TCB1_Start();
+    
     if(ds18b20 != DS18B20_OK){
         buffer.error = ds18b20;
+        ERROR_LED_SET();
         return buffer;
     }
     buffer.temp = (int16_t) temp*10;
     buffer.error = DS18B20_OK;
+
     return buffer;
 }
 
-ds18b20_error_t DS18B201_check_state(void){
+ds18b20_state_t DS18B201_check_state(void){
     return state1;
 }
-ds18b20_error_t DS18B202_check_state(void){
+ds18b20_state_t DS18B202_check_state(void){
     return state2;
 }
 

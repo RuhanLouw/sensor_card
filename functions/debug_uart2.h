@@ -14,7 +14,7 @@ extern "C" {
 
 void debug_uart_init(void);
 void debug_uart_send_string(const char *str);
-void USART0_write_string(const char *str);
+void USART1_write_string(const char *str);
 void debug1_send_string(const char *str);
 //void debug_uart_send_sensor_data(void);
 

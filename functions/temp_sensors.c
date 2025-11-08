@@ -9,9 +9,12 @@
 #include <util/delay.h>
 #include "debug_uart2.h"
 #include "../mcc_generated_files/timer/tcb0.h"
+#include "../DS.h"
+#include "../mcc_generated_files/uart/usart1.h"
 
 char debug_buffer[64];
 KTYPE_STATE_t KTYPE_STATE = KTYPE_IDLE;
+uint8_t tracker = 0;
 
 void tempSensors_init(void){
     
@@ -84,14 +87,45 @@ void CS_NTC(uint8_t ntc_num){
     }  
 };
 
+uint16_t mcp3201_read_bitbang(uint8_t ntc_num)
+{
+
+    uint16_t value = 0;
+
+    CS_NTC(ntc_num); 
+    enable_ntc();// select MCP
+    _delay_us(2);
+
+    // 16 clocks
+    for (uint8_t i=0; i<16; i++) {
+        SCK_HIGH();
+        _delay_us(2);        // short delay
+
+        value <<= 1;
+        if (READ_MISO()) {
+            value |= 1;
+        }
+
+        SCK_LOW();
+        _delay_us(2);
+    }
+
+    disable_ntc();               // release MCP
+
+    // drop null bit, keep 12 bits
+    value = (value >> 1) & 0x0FFF;
+    return value;
+}
+
 uint16_t readRaw_NTC(uint8_t ntc_num){
     uint8_t rxBuffer[2];
     CS_NTC(ntc_num);
     ENABLE_NTC_MUX();   // CS low
     _delay_us(2);   // small setup delay (tCSS)
     
-    SPI0_BufferRead(rxBuffer, 2);
-    
+//    SPI0_BufferRead(rxBuffer, 2);
+//    MEASURE_LED_SET();
+
     DISABLE_NTC_MUX();  // CS high
     uint16_t raw = ((uint16_t)rxBuffer[0] << 8) | rxBuffer[1] >> 1;
     raw &= 0x0FFF;    // keep 12 bits
@@ -102,7 +136,9 @@ float readAvg_NTC(uint8_t ntc_num, uint8_t num_reads){
     if (num_reads == 0) return 0;
     uint32_t rawBuffer = 0;
     for(uint8_t i = 0; i < num_reads; i++){
-        uint16_t raw = readRaw_NTC(ntc_num);
+        uint16_t raw = mcp3201_read_bitbang(ntc_num);
+
+        //        uint16_t raw = readRaw_NTC(ntc_num);
         
         // debug print of raw (temporary)
 //        printf("RAW[%u]: 0x%03X (%u)\n", ntc_num, raw, raw);
@@ -136,19 +172,17 @@ float getTemp_NTC(uint8_t ntc_num, uint8_t num_reads){
 NTC_SENSOR_t read_ntc(uint8_t ntc_number, uint8_t ntc_poll_number){
     NTC_SENSOR_t buffer;
     float temp = getTemp_NTC(ntc_number, ntc_poll_number);
+    
     if(temp == -INFINITY) buffer.error = 1;
     buffer.temp = (int16_t) temp*10; // Note on Master; preserve .1f
+    
     return buffer;
 }
-
-//NTC_SENSOR_t read_ntc(ntc_number, ntc_poll_number){
-//    float temp = getTemp_NTC(ntc_num, ntc_poll_number);
-//    NTC_SENSOR_t ntc;
-//}
 
 /*================================================
  KTYPE Temperature Conversion Functions
    ===============================================*/
+
 void KTYPE_bitbang(uint8_t *buffer){
     uint32_t data = 0;
     for (int i = 31; i >= 0; i--) {
@@ -175,11 +209,6 @@ KTYPE_STATE_t KTYPE_start_conversion(void){
     return KTYPE_OK;
 }
 
-void KTYPE_timer_CapCallBack(void){
-    KTYPE_STATE = KTYPE_READ_READY;
-    TCB2.CNT = 0;
-    TCB2.INTCTRL &= ~TCB_CAPT_bm; /* Capture or Timeout: disabled */
-};
     
 //};
 // Incoming command =  
@@ -259,7 +288,7 @@ KTYPE_ERROR_t readKTypeSensor(float *thermo, float *junc) {
     // Fault check
     if (data & 0x00010000UL) {
         // Fault occurred
-        ERROR_LED_SET();
+//        ERROR_LED_SET();
         if(data & 0x04){
             return KTYPE_SCV;
         };        
@@ -299,11 +328,6 @@ KTYPE_SENSOR_t read_ktype(void){
         buffer.cold_junction = 0;
         return buffer;
     }
-//    //// Debug1 : 
-//    char TxBuffer[64];
-//    sprintf(TxBuffer,"therm: %.1f, junc: %.1f\n", therm*10, junc*10);
-//    debug1_send_string(TxBuffer);
-//    ////
     float hold = therm*100;
     buffer.temp = (int16_t) hold; // Note master; preserve .2f
     hold = junc*100;
@@ -312,80 +336,17 @@ KTYPE_SENSOR_t read_ktype(void){
     return buffer;
 }
 
-//
-////// Main function
-////int main(void) {
-////    SYSTEM_Initialize(); // Initialize MCC modules (UART1, ADC, SPI, etc.)
-////    UART1_SetRxISR(UART1_RxISR); // Set UART receive ISR
-////    sei(); // Enable global interrupts
-////    while (1) {
-////        processCommand(); // Process incoming commands
-////    }
-////}
+void KTYPE_timer_CapCallBack(void){
+//    tracker +=1;
+//    UART1_Write(tracker);
+//    DS_Timeout();
+    KTYPE_STATE = KTYPE_READ_READY;
+    TCB2.CNT = 0;
+    TCB2.INTCTRL &= ~TCB_CAPT_bm; /* Capture or Timeout: disabled */
+};
 
-// Blocking 16-bit read for MCP3201 using two SPI byte exchanges.
-// Assumes:
-//  - setDecoder(ntc_channel) sets 74HC138 inputs A/B/C to select the proper decoder output
-//  - enable_ntc() pulls the selected MCP CS low
-//  - disable_ntc() releases CS high
-//  - SPI0_ByteExchange(uint8_t) performs a blocking exchange and returns received byte
-//  - _delay_us() available
-
-//uint16_t readRaw_NTC_blocking(uint8_t ntc_channel)
-//{
-//    uint8_t hi, lo;
-//    uint16_t raw;
-//
-//    // 1) Select decoder output (which routes CS to the targeted MCP)
-//    CS_NTC(ntc_channel);         // set A/B/C
-//    _delay_us(5);                // allow decoder outputs to settle (increase if necessary)
-//
-//    // 2) Enable the selected MCP CS
-//    enable_ntc();                // CS low for that MCP
-//    _delay_us(2);                // small tSUCS safe margin
-//    ERROR_LED_SET();
-//    
-//    // 3) Clock out 16 clocks, reading bytes synchronously (MSB first)
-//    hi = SPI0_ByteRead();   // clocks 8, reads first byte
-//    MEASURE_LED_SET();
-//   
-//    lo = SPI0_ByteRead();   // clocks next 8, reads second byte
-//    // 4) End transaction
-//    disable_ntc();               // CS high
-//    _delay_us(1);                // tCSH margin
-//
-//    // 5) Combine and align: drop null bit, keep 12 bits
-//    raw = (uint16_t)hi << 8 | (uint16_t)lo;
-//    raw = (raw >> 1) & 0x0FFF;
-//
-//    return raw;
-//}
-
-//uint16_t mcp3201_read_bitbang(uint8_t ntc_num)
-//{
-//    uint16_t value = 0;
-//
-//    CS_NTC(ntc_num); 
-//    enable_ntc();// select MCP
-//    _delay_us(2);
-//
-//    // 16 clocks
-//    for (uint8_t i=0; i<16; i++) {
-//        SCK_HIGH();
-//        _delay_us(2);        // short delay
-//
-//        value <<= 1;
-//        if (READ_MISO()) {
-//            value |= 1;
-//        }
-//
-//        SCK_LOW();
-//        _delay_us(2);
-//    }
-//
-//    disable_ntc();               // release MCP
-//
-//    // drop null bit, keep 12 bits
-//    value = (value >> 1) & 0x0FFF;
-//    return value;
-//}
+void KTYPE_Init(void){
+    TCB2_CaptureCallbackRegister(KTYPE_timer_CapCallBack);
+    KTYPE_start_conversion();
+//    DS_Init();
+}

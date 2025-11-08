@@ -25,7 +25,7 @@ build/default/debug/mcc_generated_files/spi/src/spi0.o.d \
  mcc_generated_files/spi/src/../../system/utils/interrupt_avr8.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\interrupt.h \
  mcc_generated_files/spi/src/../spi_interface.h \
- mcc_generated_files/spi/src/../spi_polling_types.h
+ mcc_generated_files/spi/src/../spi_interrupt_types.h
 
 mcc_generated_files/spi/src/../spi0.h:
 
@@ -77,4 +77,4 @@ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\interrupt.h:
 
 mcc_generated_files/spi/src/../spi_interface.h:
 
-mcc_generated_files/spi/src/../spi_polling_types.h:
+mcc_generated_files/spi/src/../spi_interrupt_types.h:

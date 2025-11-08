@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=mcc_generated_files/spi/src/spi0.c mcc_generated_files/system/src/pins.c mcc_generated_files/system/src/protected_io.S mcc_generated_files/system/src/interrupt.c mcc_generated_files/system/src/system.c mcc_generated_files/system/src/config_bits.c mcc_generated_files/system/src/clock.c mcc_generated_files/timer/src/tcb0.c mcc_generated_files/uart/src/usart2.c mcc_generated_files/uart/src/usart1.c main.c functions/modbus.c functions/debug_uart2.c functions/ds18b20.c functions/temp_sensors.c functions/system_registers.c mcc_generated_files/timer/src/rtc.c mcc_generated_files/timer/src/tca0.c
+SOURCEFILES_QUOTED_IF_SPACED=mcc_generated_files/spi/src/spi0.c mcc_generated_files/system/src/pins.c mcc_generated_files/system/src/protected_io.S mcc_generated_files/system/src/interrupt.c mcc_generated_files/system/src/system.c mcc_generated_files/system/src/config_bits.c mcc_generated_files/system/src/clock.c mcc_generated_files/timer/src/tcb0.c mcc_generated_files/timer/src/rtc.c mcc_generated_files/timer/src/tca0.c mcc_generated_files/timer/src/tcb1.c mcc_generated_files/timer/src/tcb2.c mcc_generated_files/uart/src/usart2.c mcc_generated_files/uart/src/usart1.c main.c functions/modbus.c functions/debug_uart2.c functions/temp_sensors.c functions/system_registers.c DS.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/mcc_generated_files/spi/src/spi0.o ${OBJECTDIR}/mcc_generated_files/system/src/pins.o ${OBJECTDIR}/mcc_generated_files/system/src/protected_io.o ${OBJECTDIR}/mcc_generated_files/system/src/interrupt.o ${OBJECTDIR}/mcc_generated_files/system/src/system.o ${OBJECTDIR}/mcc_generated_files/system/src/config_bits.o ${OBJECTDIR}/mcc_generated_files/system/src/clock.o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o ${OBJECTDIR}/mcc_generated_files/uart/src/usart1.o ${OBJECTDIR}/main.o ${OBJECTDIR}/functions/modbus.o ${OBJECTDIR}/functions/debug_uart2.o ${OBJECTDIR}/functions/ds18b20.o ${OBJECTDIR}/functions/temp_sensors.o ${OBJECTDIR}/functions/system_registers.o ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/mcc_generated_files/spi/src/spi0.o.d ${OBJECTDIR}/mcc_generated_files/system/src/pins.o.d ${OBJECTDIR}/mcc_generated_files/system/src/protected_io.o.d ${OBJECTDIR}/mcc_generated_files/system/src/interrupt.o.d ${OBJECTDIR}/mcc_generated_files/system/src/system.o.d ${OBJECTDIR}/mcc_generated_files/system/src/config_bits.o.d ${OBJECTDIR}/mcc_generated_files/system/src/clock.o.d ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o.d ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o.d ${OBJECTDIR}/mcc_generated_files/uart/src/usart1.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/functions/modbus.o.d ${OBJECTDIR}/functions/debug_uart2.o.d ${OBJECTDIR}/functions/ds18b20.o.d ${OBJECTDIR}/functions/temp_sensors.o.d ${OBJECTDIR}/functions/system_registers.o.d ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/mcc_generated_files/spi/src/spi0.o ${OBJECTDIR}/mcc_generated_files/system/src/pins.o ${OBJECTDIR}/mcc_generated_files/system/src/protected_io.o ${OBJECTDIR}/mcc_generated_files/system/src/interrupt.o ${OBJECTDIR}/mcc_generated_files/system/src/system.o ${OBJECTDIR}/mcc_generated_files/system/src/config_bits.o ${OBJECTDIR}/mcc_generated_files/system/src/clock.o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o ${OBJECTDIR}/mcc_generated_files/uart/src/usart1.o ${OBJECTDIR}/main.o ${OBJECTDIR}/functions/modbus.o ${OBJECTDIR}/functions/debug_uart2.o ${OBJECTDIR}/functions/temp_sensors.o ${OBJECTDIR}/functions/system_registers.o ${OBJECTDIR}/DS.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/mcc_generated_files/spi/src/spi0.o.d ${OBJECTDIR}/mcc_generated_files/system/src/pins.o.d ${OBJECTDIR}/mcc_generated_files/system/src/protected_io.o.d ${OBJECTDIR}/mcc_generated_files/system/src/interrupt.o.d ${OBJECTDIR}/mcc_generated_files/system/src/system.o.d ${OBJECTDIR}/mcc_generated_files/system/src/config_bits.o.d ${OBJECTDIR}/mcc_generated_files/system/src/clock.o.d ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o.d ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o.d ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o.d ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o.d ${OBJECTDIR}/mcc_generated_files/uart/src/usart1.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/functions/modbus.o.d ${OBJECTDIR}/functions/debug_uart2.o.d ${OBJECTDIR}/functions/temp_sensors.o.d ${OBJECTDIR}/functions/system_registers.o.d ${OBJECTDIR}/DS.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/mcc_generated_files/spi/src/spi0.o ${OBJECTDIR}/mcc_generated_files/system/src/pins.o ${OBJECTDIR}/mcc_generated_files/system/src/protected_io.o ${OBJECTDIR}/mcc_generated_files/system/src/interrupt.o ${OBJECTDIR}/mcc_generated_files/system/src/system.o ${OBJECTDIR}/mcc_generated_files/system/src/config_bits.o ${OBJECTDIR}/mcc_generated_files/system/src/clock.o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o ${OBJECTDIR}/mcc_generated_files/uart/src/usart1.o ${OBJECTDIR}/main.o ${OBJECTDIR}/functions/modbus.o ${OBJECTDIR}/functions/debug_uart2.o ${OBJECTDIR}/functions/ds18b20.o ${OBJECTDIR}/functions/temp_sensors.o ${OBJECTDIR}/functions/system_registers.o ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o
+OBJECTFILES=${OBJECTDIR}/mcc_generated_files/spi/src/spi0.o ${OBJECTDIR}/mcc_generated_files/system/src/pins.o ${OBJECTDIR}/mcc_generated_files/system/src/protected_io.o ${OBJECTDIR}/mcc_generated_files/system/src/interrupt.o ${OBJECTDIR}/mcc_generated_files/system/src/system.o ${OBJECTDIR}/mcc_generated_files/system/src/config_bits.o ${OBJECTDIR}/mcc_generated_files/system/src/clock.o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o ${OBJECTDIR}/mcc_generated_files/uart/src/usart1.o ${OBJECTDIR}/main.o ${OBJECTDIR}/functions/modbus.o ${OBJECTDIR}/functions/debug_uart2.o ${OBJECTDIR}/functions/temp_sensors.o ${OBJECTDIR}/functions/system_registers.o ${OBJECTDIR}/DS.o
 
 # Source Files
-SOURCEFILES=mcc_generated_files/spi/src/spi0.c mcc_generated_files/system/src/pins.c mcc_generated_files/system/src/protected_io.S mcc_generated_files/system/src/interrupt.c mcc_generated_files/system/src/system.c mcc_generated_files/system/src/config_bits.c mcc_generated_files/system/src/clock.c mcc_generated_files/timer/src/tcb0.c mcc_generated_files/uart/src/usart2.c mcc_generated_files/uart/src/usart1.c main.c functions/modbus.c functions/debug_uart2.c functions/ds18b20.c functions/temp_sensors.c functions/system_registers.c mcc_generated_files/timer/src/rtc.c mcc_generated_files/timer/src/tca0.c
+SOURCEFILES=mcc_generated_files/spi/src/spi0.c mcc_generated_files/system/src/pins.c mcc_generated_files/system/src/protected_io.S mcc_generated_files/system/src/interrupt.c mcc_generated_files/system/src/system.c mcc_generated_files/system/src/config_bits.c mcc_generated_files/system/src/clock.c mcc_generated_files/timer/src/tcb0.c mcc_generated_files/timer/src/rtc.c mcc_generated_files/timer/src/tca0.c mcc_generated_files/timer/src/tcb1.c mcc_generated_files/timer/src/tcb2.c mcc_generated_files/uart/src/usart2.c mcc_generated_files/uart/src/usart1.c main.c functions/modbus.c functions/debug_uart2.c functions/temp_sensors.c functions/system_registers.c DS.c
 
 
 
@@ -130,6 +130,30 @@ ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o: mcc_generated_files/timer/src
 	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o mcc_generated_files/timer/src/tcb0.c 
 	
+${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o: mcc_generated_files/timer/src/rtc.c  .generated_files/flags/default/4baef0540d4eb0f44cd9c68e1ba70cad384a611f .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o mcc_generated_files/timer/src/rtc.c 
+	
+${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o: mcc_generated_files/timer/src/tca0.c  .generated_files/flags/default/fde796ffa97373354955d19b0c59408ed765ca25 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o mcc_generated_files/timer/src/tca0.c 
+	
+${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o: mcc_generated_files/timer/src/tcb1.c  .generated_files/flags/default/613019da51ccf45f05fc50f12f90c0cac32ba585 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o.d 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o mcc_generated_files/timer/src/tcb1.c 
+	
+${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o: mcc_generated_files/timer/src/tcb2.c  .generated_files/flags/default/3f486be7d411cb92b882afe5abbdc0d81207bb60 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o.d 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o mcc_generated_files/timer/src/tcb2.c 
+	
 ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o: mcc_generated_files/uart/src/usart2.c  .generated_files/flags/default/4370a06fd572c7635aa4106b5352a29e9f1ef357 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/uart/src" 
 	@${RM} ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o.d 
@@ -160,12 +184,6 @@ ${OBJECTDIR}/functions/debug_uart2.o: functions/debug_uart2.c  .generated_files/
 	@${RM} ${OBJECTDIR}/functions/debug_uart2.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/functions/debug_uart2.o.d" -MT "${OBJECTDIR}/functions/debug_uart2.o.d" -MT ${OBJECTDIR}/functions/debug_uart2.o -o ${OBJECTDIR}/functions/debug_uart2.o functions/debug_uart2.c 
 	
-${OBJECTDIR}/functions/ds18b20.o: functions/ds18b20.c  .generated_files/flags/default/1bb1b9aadc37af594bb84a14e755239c9bbc37ec .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}/functions" 
-	@${RM} ${OBJECTDIR}/functions/ds18b20.o.d 
-	@${RM} ${OBJECTDIR}/functions/ds18b20.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/functions/ds18b20.o.d" -MT "${OBJECTDIR}/functions/ds18b20.o.d" -MT ${OBJECTDIR}/functions/ds18b20.o -o ${OBJECTDIR}/functions/ds18b20.o functions/ds18b20.c 
-	
 ${OBJECTDIR}/functions/temp_sensors.o: functions/temp_sensors.c  .generated_files/flags/default/c0fcc40d48d10a5650197308a1f252e6dc1cc70b .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/functions" 
 	@${RM} ${OBJECTDIR}/functions/temp_sensors.o.d 
@@ -178,17 +196,11 @@ ${OBJECTDIR}/functions/system_registers.o: functions/system_registers.c  .genera
 	@${RM} ${OBJECTDIR}/functions/system_registers.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/functions/system_registers.o.d" -MT "${OBJECTDIR}/functions/system_registers.o.d" -MT ${OBJECTDIR}/functions/system_registers.o -o ${OBJECTDIR}/functions/system_registers.o functions/system_registers.c 
 	
-${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o: mcc_generated_files/timer/src/rtc.c  .generated_files/flags/default/4baef0540d4eb0f44cd9c68e1ba70cad384a611f .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
-	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d 
-	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o mcc_generated_files/timer/src/rtc.c 
-	
-${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o: mcc_generated_files/timer/src/tca0.c  .generated_files/flags/default/fde796ffa97373354955d19b0c59408ed765ca25 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
-	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d 
-	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o mcc_generated_files/timer/src/tca0.c 
+${OBJECTDIR}/DS.o: DS.c  .generated_files/flags/default/b09bb2d4890ac08758288fc84c25964232f8fbce .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/DS.o.d 
+	@${RM} ${OBJECTDIR}/DS.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/DS.o.d" -MT "${OBJECTDIR}/DS.o.d" -MT ${OBJECTDIR}/DS.o -o ${OBJECTDIR}/DS.o DS.c 
 	
 else
 ${OBJECTDIR}/mcc_generated_files/spi/src/spi0.o: mcc_generated_files/spi/src/spi0.c  .generated_files/flags/default/7db42705e8c715bfc351d47137ef5c450e8b00ba .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
@@ -233,6 +245,30 @@ ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o: mcc_generated_files/timer/src
 	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb0.o mcc_generated_files/timer/src/tcb0.c 
 	
+${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o: mcc_generated_files/timer/src/rtc.c  .generated_files/flags/default/db19e74f6b269c3c6818f80156f0720711d0b874 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o mcc_generated_files/timer/src/rtc.c 
+	
+${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o: mcc_generated_files/timer/src/tca0.c  .generated_files/flags/default/6a017543ecb8db0d56646f88dd58a6b36f03a8c2 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o mcc_generated_files/timer/src/tca0.c 
+	
+${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o: mcc_generated_files/timer/src/tcb1.c  .generated_files/flags/default/8822ed7c5c87e006914210b78f9c138fb92e776f .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o.d 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb1.o mcc_generated_files/timer/src/tcb1.c 
+	
+${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o: mcc_generated_files/timer/src/tcb2.c  .generated_files/flags/default/d3259a866e60914569462f9f281e0a89a34ba88b .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o.d 
+	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tcb2.o mcc_generated_files/timer/src/tcb2.c 
+	
 ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o: mcc_generated_files/uart/src/usart2.c  .generated_files/flags/default/5d543b6fdbe87f4efb6bd8b531ce5072f3c79714 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/uart/src" 
 	@${RM} ${OBJECTDIR}/mcc_generated_files/uart/src/usart2.o.d 
@@ -263,12 +299,6 @@ ${OBJECTDIR}/functions/debug_uart2.o: functions/debug_uart2.c  .generated_files/
 	@${RM} ${OBJECTDIR}/functions/debug_uart2.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/functions/debug_uart2.o.d" -MT "${OBJECTDIR}/functions/debug_uart2.o.d" -MT ${OBJECTDIR}/functions/debug_uart2.o -o ${OBJECTDIR}/functions/debug_uart2.o functions/debug_uart2.c 
 	
-${OBJECTDIR}/functions/ds18b20.o: functions/ds18b20.c  .generated_files/flags/default/4e94fbb2c868a06910a4ad8f3d449b5409a8a909 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}/functions" 
-	@${RM} ${OBJECTDIR}/functions/ds18b20.o.d 
-	@${RM} ${OBJECTDIR}/functions/ds18b20.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/functions/ds18b20.o.d" -MT "${OBJECTDIR}/functions/ds18b20.o.d" -MT ${OBJECTDIR}/functions/ds18b20.o -o ${OBJECTDIR}/functions/ds18b20.o functions/ds18b20.c 
-	
 ${OBJECTDIR}/functions/temp_sensors.o: functions/temp_sensors.c  .generated_files/flags/default/7a5e3f6705e8657be649cdb1436d7381c21dbafe .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/functions" 
 	@${RM} ${OBJECTDIR}/functions/temp_sensors.o.d 
@@ -281,17 +311,11 @@ ${OBJECTDIR}/functions/system_registers.o: functions/system_registers.c  .genera
 	@${RM} ${OBJECTDIR}/functions/system_registers.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/functions/system_registers.o.d" -MT "${OBJECTDIR}/functions/system_registers.o.d" -MT ${OBJECTDIR}/functions/system_registers.o -o ${OBJECTDIR}/functions/system_registers.o functions/system_registers.c 
 	
-${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o: mcc_generated_files/timer/src/rtc.c  .generated_files/flags/default/db19e74f6b269c3c6818f80156f0720711d0b874 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
-	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d 
-	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/rtc.o mcc_generated_files/timer/src/rtc.c 
-	
-${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o: mcc_generated_files/timer/src/tca0.c  .generated_files/flags/default/6a017543ecb8db0d56646f88dd58a6b36f03a8c2 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}/mcc_generated_files/timer/src" 
-	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d 
-	@${RM} ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d" -MT "${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o.d" -MT ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o -o ${OBJECTDIR}/mcc_generated_files/timer/src/tca0.o mcc_generated_files/timer/src/tca0.c 
+${OBJECTDIR}/DS.o: DS.c  .generated_files/flags/default/ab17ace5e1c3b1c267ca5eb2d7ef16afc09a0436 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/DS.o.d 
+	@${RM} ${OBJECTDIR}/DS.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O2 -Og -ffunction-sections -fdata-sections -fshort-enums -fcommon -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mno-const-data-in-progmem     -MD -MP -MF "${OBJECTDIR}/DS.o.d" -MT "${OBJECTDIR}/DS.o.d" -MT ${OBJECTDIR}/DS.o -o ${OBJECTDIR}/DS.o DS.c 
 	
 endif
 

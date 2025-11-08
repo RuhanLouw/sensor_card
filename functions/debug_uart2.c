@@ -28,7 +28,7 @@ void debug_uart_send_string(const char *str) {
     }
 }
 
-void USART0_write_string(const char *str) {
+void USART1_write_string(const char *str) {
     while (*str) {
         while (!(USART1.STATUS & USART_DREIF_bm)); // Wait for data register empty
         USART1.TXDATAL = *str++;

@@ -41,6 +41,8 @@ void SYSTEM_Initialize(void)
     SPI0_Initialize();
     TCA0_Initialize();
     TCB0_Initialize();
+    TCB1_Initialize();
+    TCB2_Initialize();
     RTC_Initialize();
     USART1_Initialize();
     USART2_Initialize();

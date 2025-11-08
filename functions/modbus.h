@@ -24,6 +24,7 @@ void RS485_RX_ENABLE(void);
 void modbus_process(void);
 void modbus_receive(void);
 void modbus_timer_expired(void);
+void MB_Init(void);
 
 
 #ifdef	__cplusplus

@@ -39,13 +39,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-/**
-    @ingroup usart2 
-    @def Standard Input Output functions
-    @misradeviation{@required, 21.6} This inclusion is essential for UART module to use Printf function for print the character.
-*/
-/* cppcheck-suppress misra-c2012-21.6 */
-#include <stdio.h>
 #include "../system/system.h"
 #include "uart_drv_interface.h"
 
@@ -387,17 +380,6 @@ extern void (*USART2_RxInterruptHandler)(void);
  */
 void USART2_RxCompleteCallbackRegister(void (* callbackHandler)(void));
 
-#if defined(__GNUC__)
-/**
- * @ingroup usart2
- * @brief This function to be called for printing the character.
- * @param [in] character - The data to write the transmit data buffer.
- * @param [in] stream - To open the file stream.
- * @return The print status.
- */
-int USART2_printCHAR(char character, FILE *stream);
-
-#endif
 
 #ifdef __cplusplus  // Provide C++ Compatibility
 

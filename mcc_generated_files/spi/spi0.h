@@ -172,5 +172,12 @@ bool SPI0_IsRxReady(void);
  */
 bool SPI0_IsTxReady(void);
 
+/**
+ * @ingroup spi0
+ * @brief Sets the callback function to be executed at the completion of data transfer in Interrupt mode.
+ * @param Pointer to the function to be executed
+ * @return None.
+ */
+void SPI0_RxCompleteCallbackRegister(void (*callbackHandler)(void));
 
 #endif /* SPI0_H */

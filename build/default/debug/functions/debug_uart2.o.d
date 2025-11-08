@@ -6,13 +6,12 @@ build/default/debug/functions/debug_uart2.o.d \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdint.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\bits\alltypes.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\bits\stdint.h \
- c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h \
- c:\program\ files\microchip\xc8\v3.10\avr\avr\include\features.h \
  functions/../mcc_generated_files/uart/../system/system.h \
  functions/../mcc_generated_files/uart/../system/../system/utils/compiler.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\io.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\sfr_defs.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\inttypes.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\features.h \
  C:/Program\ Files/Microchip/MPLABX/v6.25/packs/Microchip/AVR-Dx_DFP/2.7.321/xc8/avr/include/avr/ioavr128db32.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\portpins.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\common.h \
@@ -50,9 +49,14 @@ build/default/debug/functions/debug_uart2.o.d \
  functions/../mcc_generated_files/uart/../system/../timer/./tca0_deprecated.h \
  functions/../mcc_generated_files/uart/../system/../timer/tcb0.h \
  functions/../mcc_generated_files/uart/../system/../timer/tcb0_deprecated.h \
+ functions/../mcc_generated_files/uart/../system/../timer/tcb1.h \
+ functions/../mcc_generated_files/uart/../system/../timer/tcb1_deprecated.h \
+ functions/../mcc_generated_files/uart/../system/../timer/tcb2.h \
+ functions/../mcc_generated_files/uart/../system/../timer/tcb2_deprecated.h \
  functions/../mcc_generated_files/uart/uart_drv_interface.h \
  functions/../mcc_generated_files/uart/usart1.h \
  functions/system_registers.h functions/debug_uart2.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\string.h \
  functions/../functions/modbus.h
 
@@ -68,10 +72,6 @@ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\bits\alltypes.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\bits\stdint.h:
 
-c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h:
-
-c:\program\ files\microchip\xc8\v3.10\avr\avr\include\features.h:
-
 functions/../mcc_generated_files/uart/../system/system.h:
 
 functions/../mcc_generated_files/uart/../system/../system/utils/compiler.h:
@@ -81,6 +81,8 @@ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\io.h:
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\sfr_defs.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\inttypes.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\features.h:
 
 C:/Program\ Files/Microchip/MPLABX/v6.25/packs/Microchip/AVR-Dx_DFP/2.7.321/xc8/avr/include/avr/ioavr128db32.h:
 
@@ -156,6 +158,14 @@ functions/../mcc_generated_files/uart/../system/../timer/tcb0.h:
 
 functions/../mcc_generated_files/uart/../system/../timer/tcb0_deprecated.h:
 
+functions/../mcc_generated_files/uart/../system/../timer/tcb1.h:
+
+functions/../mcc_generated_files/uart/../system/../timer/tcb1_deprecated.h:
+
+functions/../mcc_generated_files/uart/../system/../timer/tcb2.h:
+
+functions/../mcc_generated_files/uart/../system/../timer/tcb2_deprecated.h:
+
 functions/../mcc_generated_files/uart/uart_drv_interface.h:
 
 functions/../mcc_generated_files/uart/usart1.h:
@@ -163,6 +173,8 @@ functions/../mcc_generated_files/uart/usart1.h:
 functions/system_registers.h:
 
 functions/debug_uart2.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\string.h:
 

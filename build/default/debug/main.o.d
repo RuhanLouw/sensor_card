@@ -41,7 +41,6 @@ build/default/debug/main.o.d build/default/debug/main.o: main.c \
  mcc_generated_files/system/../uart/uart_drv_interface.h \
  mcc_generated_files/system/../uart/uart_types.h \
  mcc_generated_files/system/../uart/usart2.h \
- c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h \
  mcc_generated_files/system/../system/interrupt.h \
  mcc_generated_files/system/../system/../system/utils/atomic.h \
  mcc_generated_files/system/../spi/spi0.h \
@@ -51,12 +50,17 @@ build/default/debug/main.o.d build/default/debug/main.o: main.c \
  mcc_generated_files/system/../timer/./tca0_deprecated.h \
  mcc_generated_files/system/../timer/tcb0.h \
  mcc_generated_files/system/../timer/tcb0_deprecated.h \
+ mcc_generated_files/system/../timer/tcb1.h \
+ mcc_generated_files/system/../timer/tcb1_deprecated.h \
+ mcc_generated_files/system/../timer/tcb2.h \
+ mcc_generated_files/system/../timer/tcb2_deprecated.h \
  functions/definitions.h functions/../mcc_generated_files/system/pins.h \
  functions/../mcc_generated_files/system/system.h \
  functions/temp_sensors.h functions/../mcc_generated_files/system/port.h \
  functions/../functions/ds18b20.h \
- functions/../functions/../functions/temp_sensors.h functions/ds18b20.h \
- functions/debug_uart2.h functions/system_registers.h functions/modbus.h
+ functions/../functions/../functions/temp_sensors.h DS.h \
+ functions/debug_uart2.h functions/system_registers.h functions/modbus.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h:
 
@@ -142,8 +146,6 @@ mcc_generated_files/system/../uart/uart_types.h:
 
 mcc_generated_files/system/../uart/usart2.h:
 
-c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h:
-
 mcc_generated_files/system/../system/interrupt.h:
 
 mcc_generated_files/system/../system/../system/utils/atomic.h:
@@ -162,6 +164,14 @@ mcc_generated_files/system/../timer/tcb0.h:
 
 mcc_generated_files/system/../timer/tcb0_deprecated.h:
 
+mcc_generated_files/system/../timer/tcb1.h:
+
+mcc_generated_files/system/../timer/tcb1_deprecated.h:
+
+mcc_generated_files/system/../timer/tcb2.h:
+
+mcc_generated_files/system/../timer/tcb2_deprecated.h:
+
 functions/definitions.h:
 
 functions/../mcc_generated_files/system/pins.h:
@@ -176,10 +186,12 @@ functions/../functions/ds18b20.h:
 
 functions/../functions/../functions/temp_sensors.h:
 
-functions/ds18b20.h:
+DS.h:
 
 functions/debug_uart2.h:
 
 functions/system_registers.h:
 
 functions/modbus.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h:

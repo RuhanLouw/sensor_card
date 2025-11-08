@@ -99,7 +99,8 @@ extern volatile uint16_t sys_regs[SYS_REGS_COUNT];
  * ============================================================ */
 #define MB_REG_DS18B20_1_TEMP          0x0050
 #define MB_REG_DS18B20_2_TEMP          0x0051
-#define MB_REG_DS18B20_ERROR           0x0052
+#define MB_REG_DS18B20_1_ERROR         0x0052
+#define MB_REG_DS18B20_2_ERROR         0x0053
 
 /* ============================================================
  * COMMAND & CONFIGURATION REGISTERS

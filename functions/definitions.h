@@ -66,9 +66,11 @@ extern "C" {
 
 #define ERROR_LED_SET() IO_PD5_SetHigh()
 #define ERROR_LED_nSET() IO_PD5_SetLow()
+#define ERROR_LED_TOGGLE()  IO_PD5_Toggle();
     
 #define TX1_LED_SET() IO_PD3_SetHigh()
 #define TX1_LED_nSET() IO_PD3_SetLow()
+#define TX1_LED_Toggle() IO_PD3_Toggle()
     
 #define RX1_LED_SET() IO_PD2_SetHigh()
 #define RX1_LED_nSET() IO_PD2_SetLow()

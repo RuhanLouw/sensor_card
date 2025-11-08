@@ -7,6 +7,12 @@
 #include <stdbool.h>
 #include <util/delay.h>
 
+//UART
+/* ===========================================
+        UART in USE :: UART2
+ *  ;; change -> uart identifier
+   ===========================================*/
+
 // Modbus slave address
 #define SLAVE_ADDRESS 2
 
@@ -35,15 +41,18 @@ typedef enum {
 } mb_state_t;
 
 volatile mb_state_t slave_state = SLAVE_IDLE;
-volatile uint8_t frame_ready = 0;
-volatile uint8_t rx_buffer[256];
-volatile uint16_t rx_count = 0;
+//volatile uint8_t frame_ready = 0;
+//volatile uint8_t rx_buffer[256];
+//volatile uint16_t rx_count = 0;
 
 void MB_Init(void){
     UART1_RxCompleteCallbackRegister(modbus_receive);
     UART1_TxCompleteCallbackRegister(modbus_timer_expired);
-    //UART1_TxCompleteCallbackRegister(mb_tx_complete); // Set back to RX
+//    UART2_RxCompleteCallbackRegister(modbus_receive);
+//    UART2_TxCompleteCallbackRegister(modbus_timer_expired);    
+
     TCB0_CaptureCallbackRegister(modbus_timer_expired);
+    RS485_RX_ENABLE();
 }
 
 // RS485 RX/TX Select
@@ -120,13 +129,13 @@ void modbus_process(void) {
                 // Send response
                 TX1_LED_SET();
                 RS485_TX_ENABLE();
-                _delay_ms(4);
+                _delay_us(1);
                 for (uint8_t i = 0; i < 5 + num_regs * 2; i++) {
-                    while (!UART1_IsTxReady());
+                    while (!UART2_IsTxReady()); //UART1_IsTxReady
                     UART1_Write(tx_buffer[i]);
                 }
-                while (!UART1_IsTxDone());
-                _delay_us(100);
+                while (!UART2_IsTxDone()); //UART1_IsTxDone
+                _delay_us(1);
                 RS485_RX_ENABLE();
                 TX1_LED_nSET();
             }   
@@ -159,14 +168,14 @@ void modbus_process(void) {
                 // Send response
                 TX1_LED_SET();
                 RS485_TX_ENABLE();
-                _delay_ms(4);
+                _delay_us(1);
                 for (uint8_t i = 0; i < 5 + num_regs * 2; i++) {
                     
-                    while (!UART1_IsTxReady());
-                    UART1_Write(tx_buffer[i]);
+                    while (!UART2_IsTxReady()); //UART1_IsTxReady
+                    UART2_Write(tx_buffer[i]); //UART1_Write
 //                    ERROR_LED_SET();
                 }
-                while (!UART1_IsTxDone());
+                while (!UART2_IsTxDone()); //UART1_IsTxDone
                 _delay_us(100);
                 RS485_RX_ENABLE();
                 TX1_LED_nSET();
@@ -207,12 +216,12 @@ void modbus_process(void) {
                 RS485_TX_ENABLE();
                 _delay_ms(4);
                 for (uint8_t i = 0; i < 5 + num_regs * 2; i++) {                    
-                    while (!UART1_IsTxReady());
-                    UART1_Write(tx_buffer[i]);
+                    while (!UART2_IsTxReady()); //UART1_IsTxReady
+                    UART2_Write(tx_buffer[i]); //UART1_Write
 //                  ERROR_LED_SET();
                 }
-                while (!UART1_IsTxDone());
-                _delay_us(100);
+                while (!UART2_IsTxDone()); //UART1_IsTxDone
+                _delay_us(4);
                 RS485_RX_ENABLE();
                 TX1_LED_nSET();
             }
@@ -230,7 +239,7 @@ void modbus_process(void) {
 void modbus_receive(void) {
     if (rx_index < MAX_FRAME_SIZE) {
         RX1_LED_SET();
-        rx_buffer[rx_index++] = UART1_Read();
+        rx_buffer[rx_index++] = UART2_Read(); //UART1_Read
         // Reset timer on each byte
         TCB0.CNT = 0; // Reset counter
         TCB0_CAPTInterruptEnable(); // Enable interrupt

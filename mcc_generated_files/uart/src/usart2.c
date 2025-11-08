@@ -125,37 +125,6 @@ void USART2_ReceiveISR(void);
   Section: USART2  APIs
 */
 
-#if defined(__GNUC__)
-
-/* cppcheck-suppress misra-c2012-2.7 */
-int USART2_printCHAR(char character, FILE *stream)
-{
-    while(!(USART2_IsTxReady()))
-    {
-
-    }
-    USART2_Write(character);
-    return 0;
-}
-
-/* cppcheck-suppress misra-c2012-8.4 */
-FILE USART2_stream = FDEV_SETUP_STREAM(USART2_printCHAR, NULL, _FDEV_SETUP_WRITE);
-
-#elif defined(__ICCAVR__)
-
-/* cppcheck-suppress misra-c2012-8.4 */
-/* cppcheck-suppress misra-c2012-21.2 */
-int putchar (int outChar)
-{
-    while(!(USART2_IsTxReady()))
-    {
-
-    }
-    USART2_Write(outChar);
-    return outChar;
-}
-#endif
-
 void USART2_Initialize(void)
 {
     USART2_RxInterruptHandler = USART2_ReceiveISR;  
@@ -200,9 +169,6 @@ void USART2_Initialize(void)
     usart2RxCount = 0;
     USART2.CTRLA |= USART_RXCIE_bm; 
 
-#if defined(__GNUC__)
-    stdout = &USART2_stream;
-#endif
 }
 
 void USART2_Deinitialize(void)

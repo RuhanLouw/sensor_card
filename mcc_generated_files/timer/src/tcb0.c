@@ -71,7 +71,7 @@ void TCB0_Initialize(void)
 	/* cppcheck-suppress misra-c2012-8.7 */
     TCB0_CaptureCallbackRegister(TCB0_DefaultCaptureCallback);
 
-    TCB0.INTCTRL = (1 << TCB_CAPT_bp)   // CAPT enabled
+    TCB0.INTCTRL = (0 << TCB_CAPT_bp)   // CAPT disabled
         | (0 << TCB_OVF_bp);  // OVF disabled
 
     TCB0.CTRLA = (0 << TCB_CASCADE_bp)   // CASCADE disabled
