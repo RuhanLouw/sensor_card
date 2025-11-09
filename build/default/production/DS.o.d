@@ -55,7 +55,7 @@ build/default/production/DS.o.d build/default/production/DS.o: DS.c DS.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\math.h \
- mcc_generated_files/timer/tcb1.h
+ mcc_generated_files/timer/tcb1.h functions/system_registers.h
 
 DS.h:
 
@@ -174,3 +174,5 @@ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h:
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\math.h:
 
 mcc_generated_files/timer/tcb1.h:
+
+functions/system_registers.h:

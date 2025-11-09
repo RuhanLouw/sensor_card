@@ -2,6 +2,7 @@
 #include "DS.h"
 #include <util/delay.h>
 #include "mcc_generated_files/timer/tcb1.h"
+#include "functions/system_registers.h"
 
 #define DS_PORT1  PORTA
 #define DS_PIN1   PIN2_bm
@@ -72,27 +73,33 @@ static DS_error_t ds_reset(volatile PORT_t *port, uint8_t pin) {
 
 // --- Public API ---
 void DS_StartConversion(void) {
-    if (state1 == DS_IDLE && ds_reset(&DS_PORT1, DS_PIN1) == DS_OK) {
-        ds_write_byte(&DS_PORT1, DS_PIN1, 0xCC);
-        ds_write_byte(&DS_PORT1, DS_PIN1, 0x44);
-        state1 = DS_CONVERTING;
-        
+    bool conversion_started = false;
+    if (state1 == DS_IDLE && (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & EN_FLAG_DS18B20_1)){
+        if(ds_reset(&DS_PORT1, DS_PIN1) == DS_OK) {
+            ds_write_byte(&DS_PORT1, DS_PIN1, 0xCC);
+            ds_write_byte(&DS_PORT1, DS_PIN1, 0x44);
+            state1 = DS_CONVERTING;
+            conversion_started = true;   
+        }
     }
-    if (state2 == DS_IDLE && ds_reset(&DS_PORT2, DS_PIN2) == DS_OK) {
-        ds_write_byte(&DS_PORT2, DS_PIN2, 0xCC);
-        ds_write_byte(&DS_PORT2, DS_PIN2, 0x44);
-        state2 = DS_CONVERTING;
+    if(state2 == DS_IDLE && (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && EN_FLAG_DS18B20_2)){
+        if(ds_reset(&DS_PORT2, DS_PIN2) == DS_OK) {
+            ds_write_byte(&DS_PORT2, DS_PIN2, 0xCC);
+            ds_write_byte(&DS_PORT2, DS_PIN2, 0x44);
+            state2 = DS_CONVERTING;
+            conversion_started = true;
+        }
     }
-    if (state1 == DS_CONVERTING || state2 == DS_CONVERTING) {
+    if (conversion_started) {
         TCB1.CNT = 0;
-        TCB1.INTCTRL |= TCB_CAPT_bm;
-        
+        TCB1.INTCTRL |= TCB_CAPT_bm;       
     }
 }
 
 ds_state_t DS_Check_State(uint8_t sensor) {
     if(sensor == 1) return state1;
     if(sensor == 2) return state2;
+    else return DS_NO_DEVICE;
 }
 
 DS_SENSOR_t DS_Read(uint8_t sensor) {
@@ -125,20 +132,14 @@ DS_SENSOR_t DS_Read(uint8_t sensor) {
     result.temp = (int16_t)(raw * 6.25);  // 0.0625 * 100
     result.error = DS_OK;
     *state = DS_IDLE;
-    DS_StartConversion();
+//    DS_StartConversion();
     return result;
 }
 
 //  TCB1 Timeout Callback 
 void DS_Timeout(void) {
-    ms100_ticks += 1;    
-    UART1_Write(ms100_ticks);
-    if(ms100_ticks >= 8){
-        ms100_ticks = 0;
-        if (state1 == DS_CONVERTING) state1 = DS_READY;
-        if (state2 == DS_CONVERTING) state2 = DS_READY;
-        ERROR_LED_TOGGLE();
-    }
+    if (state1 == DS_CONVERTING) state1 = DS_READY;
+    if (state2 == DS_CONVERTING) state2 = DS_READY;
     TCB1.CNT = 0;
     TCB1.INTCTRL &= ~TCB_CAPT_bm;
     

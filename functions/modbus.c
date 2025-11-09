@@ -1,3 +1,6 @@
+/* MODBUS */
+
+
 #include "../mcc_generated_files/uart/usart1.h"
 #include "../mcc_generated_files/timer/tcb0.h"
 #include "system_registers.h"
@@ -18,9 +21,8 @@
 
 // Function codes
 #define FC_READ_HOLDING_REGISTERS 0x03
-#define FC_READ_INPUT_REGISTERS 0x04
-#define FC_WRITE_MULTIPLE_REGISTERS 0x10
 #define FC_READ_INPUT_REGISTER 0x04
+#define FC_WRITE_MULTIPLE_REGISTERS 0x10
 
 // Buffer sizes
 #define MAX_FRAME_SIZE 256
@@ -31,25 +33,9 @@ static uint8_t tx_buffer[MAX_FRAME_SIZE];
 static uint8_t rx_index = 0;
 static volatile bool frame_complete = false;
 
-
-typedef enum {
-    SLAVE_IDLE,
-    SLAVE_RX_IN_PROGRESS,
-    SLAVE_FRAME_COMPLETE,
-    SLAVE_TX_WAITING,
-    SLAVE_TX_IN_PROGRESS
-} mb_state_t;
-
-volatile mb_state_t slave_state = SLAVE_IDLE;
-//volatile uint8_t frame_ready = 0;
-//volatile uint8_t rx_buffer[256];
-//volatile uint16_t rx_count = 0;
-
 void MB_Init(void){
     UART1_RxCompleteCallbackRegister(modbus_receive);
-    UART1_TxCompleteCallbackRegister(modbus_timer_expired);
-//    UART2_RxCompleteCallbackRegister(modbus_receive);
-//    UART2_TxCompleteCallbackRegister(modbus_timer_expired);    
+//    UART1_TxCompleteCallbackRegister(modbus_timer_expired);
 
     TCB0_CaptureCallbackRegister(modbus_timer_expired);
     RS485_RX_ENABLE();
@@ -88,9 +74,7 @@ void modbus_process(void) {
         frame_complete = false;
         return;
     }
-
-//    IO_PD4_Toggle();
-    
+ 
     // Validate address and CRC
     uint16_t crc = modbus_crc16(rx_buffer, rx_index - 2);
     
@@ -99,9 +83,10 @@ void modbus_process(void) {
         rx_buffer[rx_index - 1] != (crc >> 8)) {
         rx_index = 0;
         frame_complete = false;
+        ERROR_LED_TOGGLE();   
         return;
     }
-
+  
     /*=====================  
      * MB Function CODES 
       =====================*/
@@ -127,22 +112,21 @@ void modbus_process(void) {
                 tx_buffer[4 + num_regs * 2] = crc >> 8;
 
                 // Send response
-                TX1_LED_SET();
+//                TX1_LED_SET();
                 RS485_TX_ENABLE();
-                _delay_us(1);
+                _delay_us(100);
                 for (uint8_t i = 0; i < 5 + num_regs * 2; i++) {
-                    while (!UART2_IsTxReady()); //UART1_IsTxReady
+                    while (!UART1_IsTxReady()); //UART1_IsTxReady
                     UART1_Write(tx_buffer[i]);
                 }
-                while (!UART2_IsTxDone()); //UART1_IsTxDone
-                _delay_us(1);
+                while (!UART1_IsTxDone()); //UART1_IsTxDone
+                _delay_us(100);
                 RS485_RX_ENABLE();
                 TX1_LED_nSET();
             }   
             break;
         }
         case FC_READ_HOLDING_REGISTERS: {
-            
 
             uint16_t start_addr = (rx_buffer[2] << 8) | rx_buffer[3];
             uint16_t num_regs = (rx_buffer[4] << 8) | rx_buffer[5];
@@ -166,17 +150,18 @@ void modbus_process(void) {
                 // TODO: set tx wait timer and set tx buffer, then when tx wait interrupt -> send data!
                 ////////////////////////////////////////
                 // Send response
-                TX1_LED_SET();
+//                TX1_LED_SET();
+                _delay_us(100);
                 RS485_TX_ENABLE();
-                _delay_us(1);
+                _delay_us(300);
                 for (uint8_t i = 0; i < 5 + num_regs * 2; i++) {
                     
-                    while (!UART2_IsTxReady()); //UART1_IsTxReady
-                    UART2_Write(tx_buffer[i]); //UART1_Write
+                    while (!UART1_IsTxReady()); //UART1_IsTxReady
+                    UART1_Write(tx_buffer[i]); //UART1_Write
 //                    ERROR_LED_SET();
                 }
-                while (!UART2_IsTxDone()); //UART1_IsTxDone
-                _delay_us(100);
+                while (!UART1_IsTxDone()); //UART1_IsTxDone
+                _delay_us(300);
                 RS485_RX_ENABLE();
                 TX1_LED_nSET();
                 ///////////////////////////////////////
@@ -212,16 +197,16 @@ void modbus_process(void) {
                 response[7] = (crc >> 8) & 0xFF;  // CRC High
                 
                 // --- Send response ---
-                TX1_LED_SET();
+//                TX1_LED_SET();
                 RS485_TX_ENABLE();
-                _delay_ms(4);
+                _delay_us(100);
                 for (uint8_t i = 0; i < 5 + num_regs * 2; i++) {                    
-                    while (!UART2_IsTxReady()); //UART1_IsTxReady
-                    UART2_Write(tx_buffer[i]); //UART1_Write
+                    while (!UART1_IsTxReady()); //UART1_IsTxReady
+                    UART1_Write(tx_buffer[i]); //UART1_Write
 //                  ERROR_LED_SET();
                 }
-                while (!UART2_IsTxDone()); //UART1_IsTxDone
-                _delay_us(4);
+                while (!UART1_IsTxDone()); //UART1_IsTxDone
+                _delay_us(100);
                 RS485_RX_ENABLE();
                 TX1_LED_nSET();
             }
@@ -237,29 +222,20 @@ void modbus_process(void) {
 
 // Receive interrupt handler
 void modbus_receive(void) {
-    if (rx_index < MAX_FRAME_SIZE) {
-        RX1_LED_SET();
-        rx_buffer[rx_index++] = UART2_Read(); //UART1_Read
-        // Reset timer on each byte
-        TCB0.CNT = 0; // Reset counter
-        TCB0_CAPTInterruptEnable(); // Enable interrupt
-        slave_state = SLAVE_RX_IN_PROGRESS;
-        
-    } else {
-        rx_index = 0; // Overflow, reset
-        frame_complete = false;
-    }  
+    if (frame_complete) return;  // don?t touch rx if we already flagged done
+    RX1_LED_SET();
+    rx_buffer[rx_index++] = UART1_Read();
+    TCB0.CNT = 0;
+    TCB0.INTFLAGS = TCB_CAPT_bm; // clear pending flag
+    TCB0.INTCTRL |= TCB_CAPT_bm;
 }
 
 // Timer interrupt handler (called when 4ms silence detected)
 // Added to tcb0.c DefaultInteruptHandler
 void modbus_timer_expired(void) {
-//    TX1_LED_SET();
-    if(slave_state == SLAVE_RX_IN_PROGRESS){
-        frame_complete = true;
-        slave_state = SLAVE_TX_WAITING;
-        RX1_LED_nSET();
-    }
-
-    TCB0_CAPTInterruptDisable(); // Disable until next byte    
+    TX1_LED_SET();
+    frame_complete = true;
+    RX1_LED_nSET();
+    TCB0.INTCTRL &= ~TCB_CAPT_bm; /* Capture or Timeout: disabled */    
 }
+

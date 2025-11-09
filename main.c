@@ -87,11 +87,12 @@ void _SYS_INIT(void){
 //            |   EN_FLAG_KTYPE   
 //            |   EN_FLAG_DHT22
             |   EN_FLAG_DS18B20_1
-//            |   EN_FLAG_DS18B20_2
+            |   EN_FLAG_DS18B20_2
             );
     
-//    MB_Init();    
+    MB_Init();    
     KTYPE_Init();
+    DS_Init();
     
 }
 
@@ -141,12 +142,15 @@ void poll_sensors(void) {
             sys_sensors.ktype = read_ktype(); 
         }
         // DS 1 Poll
-        if ((DS_Check_State(1) == DS_READY) & (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && EN_FLAG_DS18B20_1)) {
+        if ((DS_Check_State(1) == DS_READY) && (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && EN_FLAG_DS18B20_1)) {
                 sys_sensors.ds18b20[0] = DS_Read(1);
         }
         //DS 2 Poll
-        if ((DS_Check_State(2) == DS_READY) & (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && EN_FLAG_DS18B20_2)) {
+        if ((DS_Check_State(2) == DS_READY) && (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & EN_FLAG_DS18B20_2)) {
                 sys_sensors.ds18b20[1] = DS_Read(2);
+        }
+        if(DS_Check_State(1) == DS_IDLE || DS_Check_State(2) == DS_IDLE){
+            DS_StartConversion();
         }
 //    // DHT22 Poll
 //    if(DHT22_STATE == DHT22_READ_READY &&
@@ -169,9 +173,7 @@ void poll_sensors(void) {
 int main(void) {
     SYSTEM_Initialize();
     sei();
-    TCB0_Stop();
-    TCB1_Start();
-    TCB2_Stop();
+
     _SYS_INIT();
     
 
@@ -181,21 +183,27 @@ int main(void) {
     /////////////////////
     
     while (1) {
+        RS485_RX_ENABLE();
+        debug1_send_string("Hello my name is Ruhan\n");
+        _delay_ms(1000);
         
-        
-        poll_sensors(); // update sensor structs and registers
+//        poll_sensors(); // update sensor structs and registers
 //        modbus_process(); // Handle Modbus requests from control card
 
-        sprintf(debug_buffer, "NTC5: %d\nNTC6: %d\nDS1: %d ERROR: %d\n\n",
-                (int)sys_regs[MB_REG_NTC5_TEMP],
-                (int)sys_regs[MB_REG_NTC6_TEMP],
-                (int)sys_regs[MB_REG_DS18B20_1_TEMP],
-                (int)sys_regs[MB_REG_DS18B20_1_ERROR]);
-        
-        debug1_send_string(debug_buffer);
-        _delay_ms(500); // adjust polling rate
     }
 }
+
+
+//        sprintf(debug_buffer, "NTC5: %d\nNTC6: %d\nDS1: %d ERROR: %d\nDS1: %d ERROR: %d\n\n",
+//                (int)sys_regs[MB_REG_NTC5_TEMP],
+//                (int)sys_regs[MB_REG_NTC6_TEMP],
+//                (int)sys_regs[MB_REG_DS18B20_1_TEMP],
+//                (int)sys_regs[MB_REG_DS18B20_1_ERROR],
+//                (int)sys_regs[MB_REG_DS18B20_2_TEMP],
+//                (int)sys_regs[MB_REG_DS18B20_2_ERROR]);
+//        TX1_LED_Toggle();
+//        debug1_send_string(debug_buffer);
+//        _delay_ms(500); // adjust polling rate
    
 //        sprintf(debug_buffer, "NTC1: %d\nNTC2: %d\nNTC3: %d\nNTC4: %d\nNTC5: %d\nNTC6: %d\nNTC7: %d\nNTC8: %d\nKTYPE: %d\nKTYPE_jc: %d\nDS1: %d\nDS2 %d\n\n",
 //                (int)sys_regs[MB_REG_NTC1_TEMP],

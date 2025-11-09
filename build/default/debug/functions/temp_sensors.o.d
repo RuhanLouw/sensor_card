@@ -61,7 +61,8 @@ build/default/debug/functions/temp_sensors.o.d \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h \
  functions/debug_uart2.h functions/../mcc_generated_files/timer/tcb0.h \
- functions/../DS.h functions/../functions/definitions.h
+ functions/../DS.h functions/../functions/definitions.h \
+ functions/../mcc_generated_files/uart/usart1.h
 
 functions/definitions.h:
 
@@ -194,3 +195,5 @@ functions/../mcc_generated_files/timer/tcb0.h:
 functions/../DS.h:
 
 functions/../functions/definitions.h:
+
+functions/../mcc_generated_files/uart/usart1.h:
