@@ -39,7 +39,7 @@ The firmware continuously samples the board sensors, stages the data into a Modb
 
 ## Project Status
 
-This firmware is functional enough to document and extend, but there are some important current-state notes that future development should understand up front:
+This firmware is functional enough, but there are some important current-state notes that future development should understand up front:
 
 - `DHT11/DHT22` support is present in the tree but disabled in the active polling path.
 - The K-type path is currently treated as ready after the first `TCB2` callback and then read every loop pass.
@@ -88,7 +88,7 @@ The polling path is controlled by `SREG_STATUS` and `SREG_SENSOR_ENABLE`.
 
 The board acts as a Modbus RTU slave on `UART1`.
 
-Current communication behavior from [functions/modbus.c](C:/Users/Ruhan%20Louw/OneDrive/Documents/avr_projects/mplab%20backup%2030112025/Sensor_Controller.X/functions/modbus.c):
+Current communication behavior from [functions/modbus.c]:
 
 - Slave address: `2`
 - Expected line format: `RS485`, `9600 baud`, `8N1`
@@ -107,7 +107,7 @@ Frame reception is interrupt-driven:
 
 ## Hardware / Pin Mapping
 
-The most relevant board-level signal definitions currently live in [functions/definitions_sensor.h](C:/Users/Ruhan%20Louw/OneDrive/Documents/avr_projects/mplab%20backup%2030112025/Sensor_Controller.X/functions/definitions_sensor.h).
+The most relevant board-level signal definitions currently live in [functions/definitions_sensor.h]
 
 ### Communications
 
@@ -182,7 +182,7 @@ The `functions/` folder contains the hand-maintained application logic:
 - [functions/debug_uart2.c](C:/Users/Ruhan%20Louw/OneDrive/Documents/avr_projects/mplab%20backup%2030112025/Sensor_Controller.X/functions/debug_uart2.c)
   Auxiliary debug UART support.
 
-Other files in `functions/` appear to be older or alternate implementations, helpers, or retained references. Treat them as useful context, not necessarily active runtime code.
+Other files in `functions/` are alternate implementations, helpers, or retained references. Treat them as useful context, not necessarily active runtime code.
 
 ### MCC-generated files
 
