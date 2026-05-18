@@ -21,7 +21,7 @@ void debug_uart_send_string(const char *str) {
 }
 
  void debug1_send_string(const char *str){
-    RS485_TX_ENABLE();
+//    RS485_TX_ENABLE();
     while(*str){
         while(!UART1_IsTxReady());
         UART1_Write(*str++);
@@ -34,6 +34,22 @@ void USART1_write_string(const char *str) {
         USART1.TXDATAL = *str++;
         
     }
+}
+
+// Call this whenever you are about to send a Modbus frame
+void modbus_print_frame(const uint8_t *frame, uint16_t length)
+{
+    char hexbuf[3 * 64 + 1] = {0};  // worst case: 64 bytes -> 192 chars + null
+                                           // (3 chars per byte: "XX ")
+
+    // Safety: don't overflow if someone sends a huge frame
+    if (length > 64) length = 64;
+
+    for (uint16_t i = 0; i < length; i++) {
+        sprintf(hexbuf + 3*i, "%02X ", frame[i]);   // "A1 00 01 ..." format
+    }
+
+    printf("[MB RX] %s\r\n", hexbuf);   // you will see this on the RPi terminal
 }
 
 // Send all sensor data in human-readable format

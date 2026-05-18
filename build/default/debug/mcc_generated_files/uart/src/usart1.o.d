@@ -29,20 +29,21 @@ build/default/debug/mcc_generated_files/uart/src/usart1.o.d \
  mcc_generated_files/uart/src/../../system/config_bits.h \
  mcc_generated_files/uart/src/../../system/../system/clock.h \
  mcc_generated_files/uart/src/../../system/../system/ccp.h \
- c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\compiler.h \
- c:\mplabxide\sensor_controller.x\mcc_generated_files\system\protected_io.h \
+ mcc_generated_files/uart/src/../../system/../system/../system/utils/compiler.h \
+ mcc_generated_files/uart/src/../../system/../system/../system/protected_io.h \
  mcc_generated_files/uart/src/../../system/../system/pins.h \
  mcc_generated_files/uart/src/../../system/../system/./port.h \
  mcc_generated_files/uart/src/../../system/../system/./utils/compiler.h \
  mcc_generated_files/uart/src/../../system/../timer/rtc.h \
- c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\compiler.h \
+ mcc_generated_files/uart/src/../../system/../timer/../system/utils/compiler.h \
  mcc_generated_files/uart/src/../../system/../uart/usart1.h \
  mcc_generated_files/uart/src/../../system/../uart/usart2.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h \
  mcc_generated_files/uart/src/../../system/../uart/../system/system.h \
  mcc_generated_files/uart/src/../../system/../uart/uart_drv_interface.h \
  mcc_generated_files/uart/src/../../system/../uart/uart_types.h \
  mcc_generated_files/uart/src/../../system/../system/interrupt.h \
- c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\atomic.h \
+ mcc_generated_files/uart/src/../../system/../system/../system/utils/atomic.h \
  mcc_generated_files/uart/src/../../system/../spi/spi0.h \
  mcc_generated_files/uart/src/../../system/../spi/../system/utils/compiler.h \
  mcc_generated_files/uart/src/../../system/../spi/spi_interface.h \
@@ -112,9 +113,9 @@ mcc_generated_files/uart/src/../../system/../system/clock.h:
 
 mcc_generated_files/uart/src/../../system/../system/ccp.h:
 
-c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\compiler.h:
+mcc_generated_files/uart/src/../../system/../system/../system/utils/compiler.h:
 
-c:\mplabxide\sensor_controller.x\mcc_generated_files\system\protected_io.h:
+mcc_generated_files/uart/src/../../system/../system/../system/protected_io.h:
 
 mcc_generated_files/uart/src/../../system/../system/pins.h:
 
@@ -124,11 +125,13 @@ mcc_generated_files/uart/src/../../system/../system/./utils/compiler.h:
 
 mcc_generated_files/uart/src/../../system/../timer/rtc.h:
 
-c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\compiler.h:
+mcc_generated_files/uart/src/../../system/../timer/../system/utils/compiler.h:
 
 mcc_generated_files/uart/src/../../system/../uart/usart1.h:
 
 mcc_generated_files/uart/src/../../system/../uart/usart2.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h:
 
 mcc_generated_files/uart/src/../../system/../uart/../system/system.h:
 
@@ -138,7 +141,7 @@ mcc_generated_files/uart/src/../../system/../uart/uart_types.h:
 
 mcc_generated_files/uart/src/../../system/../system/interrupt.h:
 
-c:\mplabxide\sensor_controller.x\mcc_generated_files\system\utils\atomic.h:
+mcc_generated_files/uart/src/../../system/../system/../system/utils/atomic.h:
 
 mcc_generated_files/uart/src/../../system/../spi/spi0.h:
 

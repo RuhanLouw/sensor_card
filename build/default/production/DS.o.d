@@ -3,11 +3,16 @@ build/default/production/DS.o.d build/default/production/DS.o: DS.c DS.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdint.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\bits\alltypes.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\bits\stdint.h \
- functions/definitions.h functions/../mcc_generated_files/system/pins.h \
- c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\io.h \
- c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\sfr_defs.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stdbool.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\inttypes.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\features.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\math.h \
+ functions/system_registers.h functions/definitions_sensor.h \
+ functions/../mcc_generated_files/system/pins.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\io.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\sfr_defs.h \
  C:/Program\ Files/Microchip/MPLABX/v6.25/packs/Microchip/AVR-Dx_DFP/2.7.321/xc8/avr/include/avr/ioavr128db32.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\portpins.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\common.h \
@@ -19,7 +24,6 @@ build/default/production/DS.o.d build/default/production/DS.o: DS.c DS.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\builtins.h \
  c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\xc.h \
  c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\cci.h \
- c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stdbool.h \
  c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stddef.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdlib.h \
  functions/../mcc_generated_files/system/./utils/interrupt_avr8.h \
@@ -39,6 +43,7 @@ build/default/production/DS.o.d build/default/production/DS.o: DS.c DS.h \
  functions/../mcc_generated_files/system/../uart/uart_drv_interface.h \
  functions/../mcc_generated_files/system/../uart/uart_types.h \
  functions/../mcc_generated_files/system/../uart/usart2.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h \
  functions/../mcc_generated_files/system/../system/interrupt.h \
  functions/../mcc_generated_files/system/../system/../system/utils/atomic.h \
  functions/../mcc_generated_files/system/../spi/spi0.h \
@@ -51,11 +56,7 @@ build/default/production/DS.o.d build/default/production/DS.o: DS.c DS.h \
  functions/../mcc_generated_files/system/../timer/tcb1.h \
  functions/../mcc_generated_files/system/../timer/tcb1_deprecated.h \
  functions/../mcc_generated_files/system/../timer/tcb2.h \
- functions/../mcc_generated_files/system/../timer/tcb2_deprecated.h \
- c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h \
- c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h \
- c:\program\ files\microchip\xc8\v3.10\avr\avr\include\math.h \
- mcc_generated_files/timer/tcb1.h functions/system_registers.h
+ functions/../mcc_generated_files/system/../timer/tcb2_deprecated.h
 
 DS.h:
 
@@ -67,17 +68,27 @@ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\bits\alltypes.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\bits\stdint.h:
 
-functions/definitions.h:
+c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stdbool.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\inttypes.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\features.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\math.h:
+
+functions/system_registers.h:
+
+functions/definitions_sensor.h:
 
 functions/../mcc_generated_files/system/pins.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\io.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\sfr_defs.h:
-
-c:\program\ files\microchip\xc8\v3.10\avr\avr\include\inttypes.h:
-
-c:\program\ files\microchip\xc8\v3.10\avr\avr\include\features.h:
 
 C:/Program\ Files/Microchip/MPLABX/v6.25/packs/Microchip/AVR-Dx_DFP/2.7.321/xc8/avr/include/avr/ioavr128db32.h:
 
@@ -100,8 +111,6 @@ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\builtins.h:
 c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\xc.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\cci.h:
-
-c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stdbool.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stddef.h:
 
@@ -141,6 +150,8 @@ functions/../mcc_generated_files/system/../uart/uart_types.h:
 
 functions/../mcc_generated_files/system/../uart/usart2.h:
 
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h:
+
 functions/../mcc_generated_files/system/../system/interrupt.h:
 
 functions/../mcc_generated_files/system/../system/../system/utils/atomic.h:
@@ -166,13 +177,3 @@ functions/../mcc_generated_files/system/../timer/tcb1_deprecated.h:
 functions/../mcc_generated_files/system/../timer/tcb2.h:
 
 functions/../mcc_generated_files/system/../timer/tcb2_deprecated.h:
-
-c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h:
-
-c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h:
-
-c:\program\ files\microchip\xc8\v3.10\avr\avr\include\math.h:
-
-mcc_generated_files/timer/tcb1.h:
-
-functions/system_registers.h:

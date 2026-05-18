@@ -17,6 +17,7 @@ void debug_uart_send_string(const char *str);
 void USART1_write_string(const char *str);
 void debug1_send_string(const char *str);
 //void debug_uart_send_sensor_data(void);
+void modbus_print_frame(const uint8_t *frame, uint16_t length);
 
 
 #ifdef	__cplusplus

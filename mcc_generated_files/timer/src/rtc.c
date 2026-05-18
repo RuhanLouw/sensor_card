@@ -66,8 +66,8 @@ int8_t RTC_Initialize(void)
 
         while (RTC.PITSTATUS > 0) { /* Wait for all register to be synchronized */
     }
-    // PI disabled; 
-	RTC.PITINTCTRL = 0x0;
+    // PI enabled; 
+	RTC.PITINTCTRL = 0x1;
 
     // DBGRUN disabled; 
     RTC.PITDBGCTRL = 0x0;

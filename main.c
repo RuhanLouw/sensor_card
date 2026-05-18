@@ -35,11 +35,12 @@
     THIS SOFTWARE.
 */
 #include "mcc_generated_files/system/system.h"
-#include "functions/definitions.h"
+#include "functions/definitions_sensor.h"
 #include "functions/temp_sensors.h"
 //#include "functions/system_cmd.h"
 //#include "functions/ds18b20.h"
 #include "DS.h"
+#include "dht11.h"
 #include "functions/debug_uart2.h"
 #include "functions/system_registers.h"
 #include "functions/modbus.h"
@@ -51,48 +52,54 @@
  * GLOBAL SENSOR INSTANCES
  * ============================================================ */
 
-uint8_t ntc_samples = 10; // Set the number of samples to avg for the NTC sensors
+uint8_t ntc_samples = 20; // Set the number of samples to avg for the NTC sensors
 
 // System type
 typedef struct {
     NTC_SENSOR_t ntcs[8];
     KTYPE_SENSOR_t ktype;
-    DHT22_SENSOR_t dht22;
+    DHT11_SENSOR_t dht11;
     DS_SENSOR_t ds18b20[2];
 }SYS_SENSORS;
 
 // System Sensors Registers
 SYS_SENSORS sys_sensors;
+int uptime = 0; //1s
 
 /* ============================================================
  * FUNCTION: INITIALISE SYSTEM REGISTERS AND SENSORS
  * ============================================================ */
 void _SYS_INIT(void){   
     // System info registers
-    sys_regs[MB_REG_FIRMWARE_VERSION] = 100; // v1.00
-    sys_regs[MB_REG_UPTIME_LSW] = 2;         // To be filled from timer
-    sys_regs[MB_REG_UPTIME_MSW] = 3;
+    // After variable declarations, before MB_Init():
+    for (int i = 0; i < SREG_COUNT; i++) sys_regs[i] = 0;
+    REG(SREG_FIRMWARE) = 100; // v1.00
+    REG(SREG_UPTIME_L) = 0;         // To be filled from timer
+    REG(SREG_UPTIME_H) = 0;
     
     // --- SET ---
-    sys_regs[MB_REG_SYSTEM_STATUS] = SYS_STAT_SENSOR_POLL_ACTIVE | SYS_STAT_SYSTEM_READY;
-    sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] = (
-//                  EN_FLAG_NTC1
-//            |   EN_FLAG_NTC2
-//            |   EN_FLAG_NTC3
-//            |   EN_FLAG_NTC4
-               EN_FLAG_NTC5
-            |   EN_FLAG_NTC6
-//            |   EN_FLAG_NTC7
-//            |   EN_FLAG_NTC8
-//            |   EN_FLAG_KTYPE   
-//            |   EN_FLAG_DHT22
-            |   EN_FLAG_DS18B20_1
-            |   EN_FLAG_DS18B20_2
+    REG(SREG_STATUS) = STATUS_POLL_ACTIVE | STATUS_SYSTEM_READY;
+    REG(SREG_SENSOR_ENABLE) = (
+                ENABLE_NTC1
+            |   ENABLE_NTC2
+            |   ENABLE_NTC3
+            |   ENABLE_NTC4
+            |   ENABLE_NTC5
+            |   ENABLE_NTC6
+            |   ENABLE_NTC7
+            |   ENABLE_NTC8
+            |   ENABLE_KTYPE   
+//            |   ENABLE_DHT11
+            |   ENABLE_DS18B20_1
+            |   ENABLE_DS18B20_2
             );
+    
+    
     
     MB_Init();    
     KTYPE_Init();
     DS_Init();
+//    DHT11_Init();
     
 }
 
@@ -101,70 +108,113 @@ void _SYS_INIT(void){
  * ============================================================ */
 void update_sensor_registers(void) {
 
-    // NTC sensors (use int i, temp + error addr = 32)
+    // NTC sensors (use i, temp + error addr = 32)
     for (int i = 0; i < 8; i++) {
-        sys_regs[MB_REG_NTC1_TEMP + i] = sys_sensors.ntcs[i].temp;
-        sys_regs[MB_REG_NTC1_ERROR + i] = sys_sensors.ntcs[i].error;
+        sys_regs[SREG_NTC1_TEMP + i] = sys_sensors.ntcs[i].temp;
+        sys_regs[SREG_NTC_ERROR_BITS] |= sys_sensors.ntcs[i].error << i;
     }
-
+    
     // K-type thermocouple
-    sys_regs[MB_REG_KTYPE_TEMP] = sys_sensors.ktype.temp;
-    sys_regs[MB_REG_KTYPE_CJ_TEMP] = sys_sensors.ktype.cold_junction;
-    sys_regs[MB_REG_KTYPE_ERROR] = sys_sensors.ktype.error;
+    sys_regs[SREG_KTYPE_TEMP] = sys_sensors.ktype.temp;
+    sys_regs[SREG_KTYPE_CJ_TEMP] = sys_sensors.ktype.cold_junction;
+    sys_regs[SREG_KTYPE_ERROR] = sys_sensors.ktype.error;
 
     // DHT22
-    sys_regs[MB_REG_DHT22_TEMP] = sys_sensors.dht22.temp;
-    sys_regs[MB_REG_DHT22_HUMIDITY] = sys_sensors.dht22.humidity;
-    sys_regs[MB_REG_DHT22_ERROR] = sys_sensors.dht22.error;
+    sys_regs[SREG_DHT22_TEMP] = sys_sensors.dht11.temp;
+    sys_regs[SREG_DHT22_HUMIDITY] = sys_sensors.dht11.humidity;
+    sys_regs[SREG_DHT22_ERROR] = sys_sensors.dht11.error;
 
     // DS18B20
-    for (uint8_t i = 0; i < 2; i++) {
-        sys_regs[MB_REG_DS18B20_1_TEMP + i] = sys_sensors.ds18b20[i].temp;
-        sys_regs[MB_REG_DS18B20_1_ERROR + i] = sys_sensors.ds18b20[i].error;
-    }
+    sys_regs[SREG_DS18B20_1_TEMP] = sys_sensors.ds18b20[0].temp;
+    sys_regs[SREG_DS18B20_ERROR1] = sys_sensors.ds18b20[0].error;
+    sys_regs[SREG_DS18B20_2_TEMP] = sys_sensors.ds18b20[1].temp;
+    sys_regs[SREG_DS18B20_ERROR2] = sys_sensors.ds18b20[1].error;
+    
+    // Main System Temperatures
+    sys_regs[SREG_CHAMBER_INTERNAL] = get_chamber_temp();
+    sys_regs[SREG_HEATING_ELEMENT] = sys_sensors.ktype.temp;
+    sys_regs[SREG_EVAPORATOR] = sys_sensors.ds18b20[1].temp;
+    sys_regs[SREG_SUPERHEAT] = get_superheat_temp();
+    sys_regs[SREG_SUBCOOLING] = get_subcool_temp();
+    sys_regs[SREG_EXTERNAL] = sys_sensors.ds18b20[0].temp;
 }
 
 /* ============================================================
  * FUNCTION: Update Sensor Data 
  * ============================================================ */
 void poll_sensors(void) {
-    if(sys_regs[MB_REG_SYSTEM_STATUS] & SYS_STAT_SENSOR_POLL_ACTIVE){
+    if (sys_regs[SREG_STATUS] & STATUS_POLL_ACTIVE) {
         MEASURE_LED_SET();
-        //NTC Poll
-        for(uint8_t i=1; i<=8; i++){
-            if( sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && (EN_FLAG_NTC1 << (i-1)) ){
+        
+        // ======================================================
+        // Poll NTC sensors (1 to 8)
+        // ======================================================
+        for (uint8_t i = 1; i <= 8; i++) {
+            if (sys_regs[SREG_SENSOR_ENABLE] & (ENABLE_NTC1 << (i-1))) {
                 sys_sensors.ntcs[i-1] = read_ntc(i, ntc_samples);
+//                printf("%d ", sys_sensors.ntcs[i-1].temp);
             }
+//            printf("\n");
         }
-        // KTYPE Poll
-        if(KTYPE_check_state() == KTYPE_READ_READY &&
-                (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && EN_FLAG_KTYPE)){
+        
+        // ======================================================
+        // Poll K-Type thermocouple
+        // ======================================================
+        if ((KTYPE_check_state() == KTYPE_READ_READY) &&
+            (sys_regs[SREG_SENSOR_ENABLE] & ENABLE_KTYPE)) {
             sys_sensors.ktype = read_ktype(); 
+            printf("ktype %d \n", sys_sensors.ktype.temp);
         }
-        // DS 1 Poll
-        if ((DS_Check_State(1) == DS_READY) && (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] && EN_FLAG_DS18B20_1)) {
-                sys_sensors.ds18b20[0] = DS_Read(1);
-        }
-        //DS 2 Poll
-        if ((DS_Check_State(2) == DS_READY) && (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & EN_FLAG_DS18B20_2)) {
-                sys_sensors.ds18b20[1] = DS_Read(2);
-        }
-        if(DS_Check_State(1) == DS_IDLE || DS_Check_State(2) == DS_IDLE){
+        // ======================================================
+        // DS18B20 ? both sensors, one single state
+        // ======================================================
+        if (DS_GetSystemState() == DS_SYSTEM_READY) {
+
+            if (sys_regs[SREG_SENSOR_ENABLE] & ENABLE_DS18B20_1) {
+                sys_sensors.ds18b20[0] = DS_ReadSensor1();
+                printf("ds1 %d \n", sys_sensors.ds18b20[0].temp);
+            }
+            if (sys_regs[SREG_SENSOR_ENABLE] & ENABLE_DS18B20_2) {
+                sys_sensors.ds18b20[1] = DS_ReadSensor2();
+                printf("ds2 %d \n", sys_sensors.ds18b20[1].temp);
+            }
+
+            // We have read both ? start next conversion cycle
+            ds_system_state = DS_SYSTEM_IDLE;   // optional, but clean
             DS_StartConversion();
         }
-//    // DHT22 Poll
-//    if(DHT22_STATE == DHT22_READ_READY &&
-//             (sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] & EN_FLAG_KTYPE)){
-//        sys_sensors.dht22 = read_dht22();
-//    }
-
-    MEASURE_LED_nSET();
-    update_sensor_registers();
-    
+        // ======================================================
+        // DHT11 Poll   --->>> NOT a DHT22! damn chinese...
+        // ======================================================
+//        if(DHT11_STATE() == DHT11_READ_READY &&
+//            (sys_regs[SREG_SENSOR_ENABLE] & ENABLE_DHT11)){
+//            sys_sensors.dht11 = read_dht11();
+//            
+//            // Instant, crystal-clear debug output
+//            printf("DHT22: %c%d.%d°C   %d.%d%%RH   Err:0x%04X\r\n",
+//            (sys_sensors.dht11.temp < 0 ? '-' : '+'),           // sign
+//            abs(sys_sensors.dht11.temp) / 10,                   // degrees
+//            abs(sys_sensors.dht11.temp) % 10,                   // tenths
+//            sys_sensors.dht11.humidity / 10,                    // %RH integer
+//            sys_sensors.dht11.humidity % 10,                    // %RH tenths
+//            sys_sensors.dht11.error);                            // error code
+//        }
+//        
+        MEASURE_LED_nSET();
+        update_sensor_registers();
     } 
 }
-    
 
+
+//-------- 1s PIT -------------
+void PIT(void){
+    RUN_LED_TOGGLE();
+    uptime++;
+    REG(SREG_UPTIME_L) = uptime & 0xFFFF;
+    REG(SREG_UPTIME_H) = uptime >> 16;
+    
+//    DHT11_Tick_1Hz();
+}
 /* ============================================================= */
 /* =============================================================
  * MAIN LOOP
@@ -172,28 +222,171 @@ void poll_sensors(void) {
 /* ============================================================= */
 int main(void) {
     SYSTEM_Initialize();
-    sei();
 
+    RTC_SetPITIsrCallback(PIT);
     _SYS_INIT();
-    
-
     RS485_RX_ENABLE();
-    char debug_buffer[256] = {0};
-    RUN_LED_SET();
-    /////////////////////
-    
-    while (1) {
-        RS485_RX_ENABLE();
-        debug1_send_string("Hello my name is Ruhan\n");
-        _delay_ms(1000);
-        
-//        poll_sensors(); // update sensor structs and registers
-//        modbus_process(); // Handle Modbus requests from control card
 
+    RUN_LED_SET();
+    sei();
+    
+    while(1) {
+         modbus_process();
+         poll_sensors();
     }
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    char debug_buffer[256] = {0};
+//    uint8_t debug_index = 0;
+
+
+
+//        
+//        sprintf(debug_buffer, "Hello");
+//        printf(debug_buffer);
+//        
+//        _delay_ms(1000);
+//
+//char debug_tx[128] = {0};
+//void test_crc(void) {
+//    uint8_t test[6] = {0x02, 0x03, 0x00, 0x00, 0x00, 0x04};
+//    uint16_t crc = modbus_crc16(test, 6);
+//    
+//    sprintf(debug_tx, "TEST CRC: %02X %02X | LEN=%d\r\n", 
+//            crc & 0xFF, crc >> 8, 6);
+//    RS485_TX_ENABLE();
+//    _delay_ms(100);
+//    USART1_write_string(debug_tx);
+//    _delay_ms(100);
+//    RS485_RX_ENABLE();
+//}
+//
+//int main(void) {
+//    SYSTEM_Initialize();
+//    sei();
+//    _SYS_INIT();
+//    RS485_RX_ENABLE();
+//
+//    test_crc();  // ? ADD THIS
+//
+//    while(1) {
+//        if (MB_IsFrameReady() && MB_GetState() == MB_STATE_IDLE) {
+//            MB_EchoLastFrame();
+//        }
+//    }
+//}
+
+//        if(UART2_IsRxReady()){
+//            debug_buffer[debug_index] = UART2_Read();
+//            if(debug_buffer[debug_index] == '\n'){
+//                
+//            }
+//        }
+//
+//#define DEBUG_BUFFER_SIZE 128
+//
+//static uint8_t debug_buffer[DEBUG_BUFFER_SIZE];
+//static uint8_t debug_index = 0;
+//
+////void RS485_TX_ENABLE(void) { IO_PC3_SetHigh(); }
+////void RS485_RX_ENABLE(void) { IO_PC3_SetLow(); }
+//
+//void process_echo(void) {
+//    if (UART1_IsRxReady()) {
+//        RX1_LED_Toggle();
+//        uint8_t byte = UART1_Read();
+//
+//        // Store in buffer
+//        if (debug_index < DEBUG_BUFFER_SIZE - 1) {
+//            debug_buffer[debug_index++] = byte;
+//        }
+//
+//        // If Enter ('\n') ? echo back entire line
+//        if (byte == '\n' || byte == '\r') {
+//            TX1_LED_Toggle();
+//
+//            // Optional: replace \r with \n for clean output
+//            if (byte == '\r') debug_buffer[debug_index - 1] = '\n';
+//
+//            // Switch to TX
+//            RS485_TX_ENABLE();
+//            _delay_us(100);
+//
+//            // Send back all bytes
+//            for (uint8_t i = 0; i < debug_index; i++) {
+//                while (!UART1_IsTxReady());
+//                UART1_Write(debug_buffer[i]);
+//            }
+//
+//            // Wait for transmission
+//            while (!UART1_IsTxDone());
+//            _delay_us(100);
+//
+//            // Back to RX
+//            RS485_RX_ENABLE();
+//
+//            // Reset buffer
+//            debug_index = 0;
+//        }
+//    }
+//}
+//
+//int main(void) {
+//    SYSTEM_Initialize();
+//    RS485_RX_ENABLE();  // Start in receive mode
+//    RUN_LED_SET();
+//    while (1) {
+////        process_echo();
+////
+//        // Optional: heartbeat
+////        ERROR_LED_TOGGLE();
+//        if(UART1_IsRxReady()){
+//            uint8_t buf = UART1_Read();
+//            ERROR_LED_TOGGLE();
+//            RS485_TX_ENABLE();
+//            _delay_ms(1);
+//            UART1_Write(buf);
+//            while(!UART1_IsTxDone());
+//            _delay_ms(1);
+//            RS485_RX_ENABLE();
+//        }
+//        
+////        debug1_send_string("a");
+//        
+////        _delay_ms(50);
+//    }
+//}
+//
+//
+//
+
+
+
+
+//        RS485_RX_ENABLE();
+//        debug1_send_string("Hello my name is Ruhan\n");
+//        _delay_ms(1000);
 //        sprintf(debug_buffer, "NTC5: %d\nNTC6: %d\nDS1: %d ERROR: %d\nDS1: %d ERROR: %d\n\n",
 //                (int)sys_regs[MB_REG_NTC5_TEMP],
 //                (int)sys_regs[MB_REG_NTC6_TEMP],

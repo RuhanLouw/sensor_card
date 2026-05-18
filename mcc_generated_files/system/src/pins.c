@@ -60,9 +60,9 @@ void PIN_MANAGER_Initialize()
 
   /* OUT Registers Initialization */
     PORTA.OUT = 0x0;
-    PORTC.OUT = 0x3;
+    PORTC.OUT = 0x1;
     PORTD.OUT = 0x0;
-    PORTF.OUT = 0x3;
+    PORTF.OUT = 0x1;
 
   /* DIR Registers Initialization */
     PORTA.DIR = 0x40;

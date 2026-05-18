@@ -41,10 +41,10 @@
   Section: Macro Declarations
 */
 
-#define USART1_TX_BUFFER_SIZE (1024U) //buffer size should be 2^n
+#define USART1_TX_BUFFER_SIZE (256U) //buffer size should be 2^n
 #define USART1_TX_BUFFER_MASK (USART1_TX_BUFFER_SIZE - 1U) 
 
-#define USART1_RX_BUFFER_SIZE (1024U) //buffer size should be 2^n
+#define USART1_RX_BUFFER_SIZE (64U) //buffer size should be 2^n
 #define USART1_RX_BUFFER_MASK (USART1_RX_BUFFER_SIZE - 1U)
 
 
@@ -88,9 +88,9 @@ static volatile uint16_t usart1TxTail = 0;
 static volatile uint16_t usart1TxBufferRemaining;
 static volatile uint8_t usart1TxBuffer[USART1_TX_BUFFER_SIZE];
 static volatile bool usart1IsTxComplete;
-static volatile uint16_t usart1RxHead = 0;
-static volatile uint16_t usart1RxTail = 0;
-static volatile uint16_t usart1RxCount;
+static volatile uint8_t usart1RxHead = 0;
+static volatile uint8_t usart1RxTail = 0;
+static volatile uint8_t usart1RxCount;
 static volatile uint8_t usart1RxBuffer[USART1_RX_BUFFER_SIZE];
 /**
  * @misradeviation{@advisory,19.2}
@@ -100,6 +100,13 @@ static volatile uint8_t usart1RxBuffer[USART1_RX_BUFFER_SIZE];
 static volatile usart1_status_t usart1RxStatusBuffer[USART1_RX_BUFFER_SIZE];
  /* cppcheck-suppress misra-c2012-19.2 */
 static volatile usart1_status_t usart1RxLastError;
+
+volatile uint16_t usart1_cnt_ferr;
+volatile uint16_t usart1_cnt_perr;
+volatile uint16_t usart1_cnt_bufovf;
+volatile uint16_t usart1_cnt_sw_ovf;
+volatile uint8_t valChecker[8];
+volatile uint8_t valCheckerIdx = 0;
 
 /**
   Section: USART1 APIs
@@ -298,7 +305,7 @@ size_t USART1_ErrorGet(void)
 uint8_t USART1_Read(void)
 {
     uint8_t readValue  = 0;
-    uint16_t tempRxTail;
+    uint8_t tempRxTail;
     
     readValue = usart1RxBuffer[usart1RxTail];
     tempRxTail = (usart1RxTail + 1U) & USART1_RX_BUFFER_MASK; // Buffer size of RX should be in the 2^n  
@@ -314,11 +321,7 @@ uint8_t USART1_Read(void)
     return readValue;
 }
 
-/* Interrupt service routine for RX complete */
-/* cppcheck-suppress misra-c2012-2.7 */
-/* cppcheck-suppress misra-c2012-8.4 */
 ISR(USART1_RXC_vect)
-/* cppcheck-suppress misra-c2012-5.5 */
 {
     USART1_RxInterruptHandler();
 }
@@ -326,40 +329,53 @@ ISR(USART1_RXC_vect)
 void USART1_ReceiveISR(void)
 {
     uint8_t regValue;
-    uint16_t tempRxHead;
+    uint8_t tempRxHead;
+    uint8_t status;
+    
+    status = USART1.RXDATAH;
+    regValue = USART1.RXDATAL;
+    
+    // ADD value checker!!!
+    valChecker[valCheckerIdx++] = regValue;
+    
+    
+    
     
     usart1RxStatusBuffer[usart1RxHead].status = 0;
 
-    if(USART_FERR_bm == (USART1.RXDATAH & USART_FERR_bm))
+    if(USART_FERR_bm == (status & USART_FERR_bm))
     {
         usart1RxStatusBuffer[usart1RxHead].ferr = 1;
+        usart1_cnt_ferr++;
+
         if(NULL != USART1_FramingErrorHandler)
         {
             USART1_FramingErrorHandler();
         } 
     }
-    if(USART_PERR_bm == (USART1.RXDATAH & USART_PERR_bm))
+    if(USART_PERR_bm == (status & USART_PERR_bm))
     {
         usart1RxLastError.perr = 1;
+        usart1_cnt_perr++;
         if(NULL != USART1_ParityErrorHandler)
         {
             USART1_ParityErrorHandler();
         }  
     }
-    if(USART_BUFOVF_bm == (USART1.RXDATAH & USART_BUFOVF_bm))
+    if(USART_BUFOVF_bm == (status & USART_BUFOVF_bm))
     {
         usart1RxStatusBuffer[usart1RxHead].oerr = 1;
+        usart1_cnt_bufovf++;
         if(NULL != USART1_OverrunErrorHandler)
         {
             USART1_OverrunErrorHandler();
         }   
     }    
-    
-    regValue = USART1.RXDATAL;
-    
+        
     tempRxHead = (usart1RxHead + 1U) & USART1_RX_BUFFER_MASK;// Buffer size of RX should be in the 2^n
     if (tempRxHead == usart1RxTail) {
 		// ERROR! Receive buffer overflow 
+        usart1_cnt_sw_ovf++;
 	} 
     else
     {
@@ -375,7 +391,7 @@ void USART1_ReceiveISR(void)
     }
     
     else {
-        // Do Nothing. Added for MISRA C Compliant.
+        // nothing
     }
 }
 

@@ -1,24 +1,24 @@
 #include "system_registers.h"
 
-volatile uint16_t sys_regs[SYS_REGS_COUNT];
+volatile int16_t sys_regs[SREG_COUNT] = {0};
 // -------------------------------------------------------------
 // Function: Enable all sensors by setting the flag bits
 // -------------------------------------------------------------
 void enable_all_sensors(void)
 {
-    sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] =
-          EN_FLAG_NTC1
-        | EN_FLAG_NTC2
-        | EN_FLAG_NTC3
-        | EN_FLAG_NTC4
-        | EN_FLAG_NTC5
-        | EN_FLAG_NTC6
-        | EN_FLAG_NTC7
-        | EN_FLAG_NTC8
-        | EN_FLAG_KTYPE
-        | EN_FLAG_DHT22
-        | EN_FLAG_DS18B20_1
-        | EN_FLAG_DS18B20_2;
+    sys_regs[SREG_SENSOR_ENABLE] =
+          ENABLE_NTC1
+        | ENABLE_NTC2
+        | ENABLE_NTC3
+        | ENABLE_NTC4
+        | ENABLE_NTC5
+        | ENABLE_NTC6
+        | ENABLE_NTC7
+        | ENABLE_NTC8
+        | ENABLE_KTYPE
+        | ENABLE_DHT11
+        | ENABLE_DS18B20_1
+        | ENABLE_DS18B20_2;
 }
 
 // -------------------------------------------------------------
@@ -26,12 +26,12 @@ void enable_all_sensors(void)
 // -------------------------------------------------------------
 void enable_sensor(uint16_t flag)
 {
-    sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] |= flag;
+    sys_regs[SREG_SENSOR_ENABLE] |= flag;
 }
 
 void disable_sensor(uint16_t flag)
 {
-    sys_regs[MB_REG_SENSOR_ENABLE_FLAGS] &= ~flag;
+    sys_regs[SREG_SENSOR_ENABLE] &= ~flag;
 }
 
 

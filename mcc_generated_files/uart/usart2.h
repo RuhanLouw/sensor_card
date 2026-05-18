@@ -39,6 +39,13 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+/**
+    @ingroup usart2 
+    @def Standard Input Output functions
+    @misradeviation{@required, 21.6} This inclusion is essential for UART module to use Printf function for print the character.
+*/
+/* cppcheck-suppress misra-c2012-21.6 */
+#include <stdio.h>
 #include "../system/system.h"
 #include "uart_drv_interface.h"
 
@@ -75,8 +82,8 @@
 #define UART2_AutoBaudEventEnableGet    (NULL)
 #define UART2_ErrorGet             USART2_ErrorGet
 
-#define UART2_TxCompleteCallbackRegister     USART2_TxCompleteCallbackRegister
-#define UART2_RxCompleteCallbackRegister      USART2_RxCompleteCallbackRegister
+#define UART2_TxCompleteCallbackRegister     (NULL)
+#define UART2_RxCompleteCallbackRegister      (NULL)
 #define UART2_TxCollisionCallbackRegister  (NULL)
 #define UART2_FramingErrorCallbackRegister USART2_FramingErrorCallbackRegister
 #define UART2_OverrunErrorCallbackRegister USART2_OverrunErrorCallbackRegister
@@ -186,37 +193,7 @@ void USART2_ReceiveEnable(void);
  */
 void USART2_ReceiveDisable(void);
 
-/**
- * @ingroup usart2
- * @brief This API enables the USART2 transmitter interrupt.
- * @param None.
- * @return None.
- */
-void USART2_TransmitInterruptEnable(void);
 
-/**
- * @ingroup usart2
- * @brief This API disables the USART2 transmitter interrupt.
- * @param None.
- * @return None.
- */
-void USART2_TransmitInterruptDisable(void);
-
-/**
- * @ingroup usart2
- * @brief This API enables the USART2 receiver interrupt.
- * @param None.
- * @return None.
- */
-void USART2_ReceiveInterruptEnable(void);
-
-/**
- * @ingroup usart2
- * @brief This API disables the USART2 receiver interrupt.
- * @param None.
- * @return None.
- */
-void USART2_ReceiveInterruptDisable(void);
 
 /**
  * @ingroup usart2
@@ -330,56 +307,19 @@ void USART2_OverrunErrorCallbackRegister(void (* callbackHandler)(void));
  */
 void USART2_ParityErrorCallbackRegister(void (* callbackHandler)(void));
 
+
+
+#if defined(__GNUC__)
 /**
  * @ingroup usart2
- * @brief This function is the ISR function to be called upon Transmitter interrupt.
- * @param void.
- * @return None.
+ * @brief This function to be called for printing the character.
+ * @param [in] character - The data to write the transmit data buffer.
+ * @param [in] stream - To open the file stream.
+ * @return The print status.
  */
-void USART2_TransmitISR(void);
+int USART2_printCHAR(char character, FILE *stream);
 
-/**
- * @ingroup usart2
- * @brief This indicates the function called when the transmitter interrupt occurs.
- * @pre Initialize the USART2 module with the transmit interrupt enabled.
- * @param None.
- * @return None.
- */
-extern void (*USART2_TxInterruptHandler)(void);
-
-/**
- * @ingroup usart2
- * @brief This API registers the function to be called upon Transmitter interrupt.
- * @param callbackHandler - a function pointer which will be called upon Transmitter interrupt condition.
- * @return None.
- */
-void USART2_TxCompleteCallbackRegister(void (* callbackHandler)(void));
-
-/**
- * @ingroup usart2
- * @brief This function is the ISR function to be called upon Receiver interrupt.
- * @param void.
- * @return None.
- */
-void USART2_ReceiveISR(void);
-
-/**
- * @ingroup usart2
- * @brief This indicates the function called when the receiver interrupt occurs.
- * @pre Initialize the USART2 module with the receive interrupt enabled.
- * @param None.
- * @return None.
- */
-extern void (*USART2_RxInterruptHandler)(void);
-
-/**
- * @ingroup usart2
- * @brief This API registers the function to be called upon Receiver interrupt.
- * @param callbackHandler - a function pointer which will be called upon Receiver interrupt condition.
- * @return None.
- */
-void USART2_RxCompleteCallbackRegister(void (* callbackHandler)(void));
-
+#endif
 
 #ifdef __cplusplus  // Provide C++ Compatibility
 

@@ -1,5 +1,5 @@
 
-#include "definitions.h"
+#include "definitions_sensor.h"
 #include "temp_sensors.h"
 #include "../mcc_generated_files/system/system.h"
 //#include "../mcc_generated_files/spi/spi0.h"
@@ -8,13 +8,37 @@
 #define F_CPU 16000000UL
 #include <util/delay.h>
 #include "debug_uart2.h"
-#include "../mcc_generated_files/timer/tcb0.h"
+//#include "../mcc_generated_files/timer/tcb0.h"
 #include "../DS.h"
 #include "../mcc_generated_files/uart/usart1.h"
 
 char debug_buffer[64];
 KTYPE_STATE_t KTYPE_STATE = KTYPE_IDLE;
 uint8_t tracker = 0;
+
+
+float ntc_temp[8] = {0};
+
+float prev_chamber_hold = 0;
+bool start_chamber_hold = true;
+
+float prev_superheat_hold = 0;
+bool start_suberheat_hold = true;
+
+float prev_subcool_hold = 0;
+bool start_subcool_hold = true;
+
+float filter_temp = 3; //  actual filter_temp/10
+
+#define I16_ABS(x)   ((int16_t)((x) < 0 ? -(x) : (x)))
+
+/* round float to int16 (°C×10) correctly for negatives too */
+static inline int16_t f_to_i16_round(float x)
+{
+    return (int16_t)(x + ((x >= 0.0f) ? 0.5f : -0.5f));
+}
+
+
 
 void tempSensors_init(void){
     
@@ -33,7 +57,7 @@ void tempSensors_init(void){
     _A();
     _B();
     _C();
-    DISABLE_KTYPE();
+    DISABLE_KTYPE_PIN();
 
 }
 
@@ -42,7 +66,7 @@ void tempSensors_init(void){
    ===============================================*/
 
 // Select a single NTC component
-void CS_NTC(uint8_t ntc_num){
+void CS_NTC(uint8_t ntc_num){ //
     switch(ntc_num){
         case 1:
             _nA();
@@ -94,12 +118,12 @@ uint16_t mcp3201_read_bitbang(uint8_t ntc_num)
 
     CS_NTC(ntc_num); 
     enable_ntc();// select MCP
-    _delay_us(2);
+    _delay_us(0.5);
 
     // 16 clocks
     for (uint8_t i=0; i<16; i++) {
         SCK_HIGH();
-        _delay_us(2);        // short delay
+        _delay_us(0.5);        // short delay
 
         value <<= 1;
         if (READ_MISO()) {
@@ -107,7 +131,7 @@ uint16_t mcp3201_read_bitbang(uint8_t ntc_num)
         }
 
         SCK_LOW();
-        _delay_us(2);
+        _delay_us(0.5);
     }
 
     disable_ntc();               // release MCP
@@ -117,20 +141,20 @@ uint16_t mcp3201_read_bitbang(uint8_t ntc_num)
     return value;
 }
 
-uint16_t readRaw_NTC(uint8_t ntc_num){
-    uint8_t rxBuffer[2];
-    CS_NTC(ntc_num);
-    ENABLE_NTC_MUX();   // CS low
-    _delay_us(2);   // small setup delay (tCSS)
-    
-//    SPI0_BufferRead(rxBuffer, 2);
-//    MEASURE_LED_SET();
-
-    DISABLE_NTC_MUX();  // CS high
-    uint16_t raw = ((uint16_t)rxBuffer[0] << 8) | rxBuffer[1] >> 1;
-    raw &= 0x0FFF;    // keep 12 bits
-    return raw;
-}
+//uint16_t readRaw_NTC(uint8_t ntc_num){
+//    uint8_t rxBuffer[2];
+//    CS_NTC(ntc_num);
+//    ENABLE_NTC_MUX();   // CS low
+//    _delay_us(2);   // small setup delay (tCSS)
+//    
+////    SPI0_BufferRead(rxBuffer, 2);
+////    MEASURE_LED_SET();
+//
+//    DISABLE_NTC_MUX();  // CS high
+//    uint16_t raw = ((uint16_t)rxBuffer[0] << 8) | rxBuffer[1] >> 1;
+//    raw &= 0x0FFF;    // keep 12 bits
+//    return raw;
+//}
 
 float readAvg_NTC(uint8_t ntc_num, uint8_t num_reads){
     if (num_reads == 0) return 0;
@@ -144,15 +168,15 @@ float readAvg_NTC(uint8_t ntc_num, uint8_t num_reads){
 //        printf("RAW[%u]: 0x%03X (%u)\n", ntc_num, raw, raw);
 
         rawBuffer += raw;
-        _delay_us(10); // small inter-sample delay; adjust as needed
+        _delay_us(0.5); // small inter-sample delay; adjust as needed
     }
-    float avg = (float)rawBuffer / (float)num_reads;
+    float avg = ((float)rawBuffer * 1.00f) / ((float)num_reads * 1.00f);
     return avg;
 }
 
 // return in 'C
 float getTemp_NTC(uint8_t ntc_num, uint8_t num_reads){
-    DISABLE_KTYPE();
+    DISABLE_KTYPE_PIN();
     float rawAvg = readAvg_NTC(ntc_num, num_reads);
     if (rawAvg < 1.0f) {
         // raw near zero -> probably wiring/CS issue. Return NaN or sentinel.
@@ -164,7 +188,7 @@ float getTemp_NTC(uint8_t ntc_num, uint8_t num_reads){
         return -INFINITY;
     }
     float r_ntc = (v_in * R_FIXED) / (V_REF - v_in);
-    float tempK = 1.0f / ((1.0f / T_25) + (1.0f / BETA) * logf(r_ntc / R_25));
+    float tempK = 1.00f / ((1.00f / T_25) + (1.00f / BETA) * logf(r_ntc / R_25));
     float tempC = tempK - 273.15f;
     return tempC;
 }
@@ -172,13 +196,188 @@ float getTemp_NTC(uint8_t ntc_num, uint8_t num_reads){
 NTC_SENSOR_t read_ntc(uint8_t ntc_number, uint8_t ntc_poll_number){
     NTC_SENSOR_t buffer;
     float temp = getTemp_NTC(ntc_number, ntc_poll_number);
-    
-    if(temp == -INFINITY) buffer.error = 1;
-    buffer.temp = (int16_t) temp*10; // Note on Master; preserve .1f
-    
+    ntc_temp[ntc_number - 1] = temp;
+
+    if(temp == -INFINITY) {
+        buffer.error = 1;
+        buffer.temp = -32768;
+    }
+    else {
+        buffer.error = 0;
+        buffer.temp = (int16_t)(temp*10.0f); // Note on Master; preserve .1f
+        
+    }
     return buffer;
 }
 
+int16_t get_chamber_temp(void)
+{
+    /* raw measurement in °C×10 */
+    float avgC = ((ntc_temp[0] - 0.3f) + (ntc_temp[1] - 0.3f) + ntc_temp[2] + (ntc_temp[3] - 0.3f)) / 4.0f;
+
+    /* If any sensor is invalid (Inf/NaN), dont update filter_hold last value */
+    if (!isfinite(avgC)) {
+        return start_chamber_hold ? (int16_t)-32768 : (int16_t)prev_chamber_hold;
+    }
+
+    int16_t raw_x10 = f_to_i16_round(avgC * 10.0f);
+
+    /* init: first valid value becomes the starting output */
+    if (start_chamber_hold) {
+        prev_chamber_hold = (float)raw_x10;
+        start_chamber_hold = false;
+        return raw_x10;
+    }
+
+    int16_t prev_x10 = (int16_t)prev_chamber_hold;
+    int16_t diff     = (int16_t)(raw_x10 - prev_x10);
+
+//    /* 1) Deadband: if it?s just bouncing, ignore it */
+//    int16_t deadband_x10 = (int16_t)filter_temp;     // filter_temp is already ×10
+//    if (I16_ABS(diff) <= deadband_x10) {
+//        return prev_x10;
+//    }
+
+    /* 2) Slew limit: allow change, but only up to this per second */
+    const int16_t MAX_STEP_X10 = 3;                  // 0.5°C per second (tune 3..10)
+    if (diff >  MAX_STEP_X10) diff =  MAX_STEP_X10;
+    if (diff < -MAX_STEP_X10) diff = -MAX_STEP_X10;
+
+    prev_x10 = (int16_t)(prev_x10 + diff);
+
+    /* Save new filtered value */
+    prev_chamber_hold = (float)prev_x10;
+    return prev_x10;
+}
+//int16_t get_chamber_temp(void){
+//    float hold = (ntc_temp[0] + ntc_temp[1] + ntc_temp[2] + ntc_temp[3]) / 4.00f;
+//    hold = hold * 10.00f;
+////    printf("ntc chamber hold: %0.1f ", hold);
+//    
+//    if(!start_chamber_hold){
+//        if( (prev_chamber_hold < (hold - filter_temp)) || (prev_chamber_hold > (hold + filter_temp)) ){
+//            hold = prev_chamber_hold;
+////            printf("chamber hold: %0.1f ", hold);
+//            return (int16_t) hold;
+//        }
+//    }
+//    
+//    prev_chamber_hold = hold;
+//    start_chamber_hold = false;
+////    printf("chamber hold: %0.1f ", hold);
+//    return (int16_t) hold;
+//}
+
+int16_t get_superheat_temp(void)
+{
+    /* If either sensor invalid, hold last value */
+    if (!isfinite(ntc_temp[4]) || !isfinite(ntc_temp[5])) {
+        return start_suberheat_hold ? (int16_t)-32768 : (int16_t)prev_superheat_hold;
+    }
+
+    float dT = (ntc_temp[5] - ntc_temp[4]);          // °C
+    int16_t raw_x10 = f_to_i16_round(dT * 10.0f);     // °C×10
+
+    if (start_suberheat_hold) {
+        prev_superheat_hold = (float)raw_x10;
+        start_suberheat_hold = false;
+        return raw_x10;
+    }
+
+    int16_t prev_x10 = (int16_t)prev_superheat_hold;
+    int16_t diff     = (int16_t)(raw_x10 - prev_x10);
+
+//    /* noisier (difference of 2 sensors), so typically smaller deadband than chamber */
+//    int16_t deadband_x10 = (int16_t)filter_temp;      // try 3..5 if 10 feels too stiff
+//    if (I16_ABS(diff) <= deadband_x10) {
+//        return prev_x10;
+//    }
+
+    /* dT can change faster than chamber */
+    const int16_t MAX_STEP_X10 = 5;                  // 2.0°C per second (tune 10..30)
+    if (diff >  MAX_STEP_X10) diff =  MAX_STEP_X10;
+    if (diff < -MAX_STEP_X10) diff = -MAX_STEP_X10;
+
+    prev_x10 = (int16_t)(prev_x10 + diff);
+
+    prev_superheat_hold = (float)prev_x10;
+    return prev_x10;
+}
+
+
+//int16_t get_superheat_temp(void){
+//    float hold = ntc_temp[5] - ntc_temp[4];
+//    hold = hold * 10.0f;
+//    
+//    if(!start_suberheat_hold){
+//        if( (prev_superheat_hold < (hold - filter_temp - 0.5f)) || (prev_superheat_hold > (hold + filter_temp + 0.5f)) ){
+//            hold = prev_superheat_hold;
+////            printf("superheat hold: %0.1f ", hold);
+//            return (int16_t) hold;
+//        }
+//    }
+//    
+//    prev_superheat_hold = hold;
+//    start_suberheat_hold = false;
+////    printf("superheat hold: %0.1f ", hold);
+//    return (int16_t) hold;
+//}
+
+
+int16_t get_subcool_temp(void)
+{
+    if (!isfinite(ntc_temp[6]) || !isfinite(ntc_temp[7])) {
+        return start_subcool_hold ? (int16_t)-32768 : (int16_t)prev_subcool_hold;
+    }
+
+    float dT = (ntc_temp[6] - ntc_temp[7]);
+    int16_t raw_x10 = f_to_i16_round(dT * 10.0f);
+
+    if (start_subcool_hold) {
+        prev_subcool_hold = (float)raw_x10;
+        start_subcool_hold = false;
+        return raw_x10;
+    }
+
+    int16_t prev_x10 = (int16_t)prev_subcool_hold;
+    int16_t diff     = (int16_t)(raw_x10 - prev_x10);
+
+//    int16_t deadband_x10 = (int16_t)filter_temp;
+//    if (I16_ABS(diff) <= deadband_x10) {
+//        return prev_x10;
+//    }
+
+    const int16_t MAX_STEP_X10 = 10;
+    if (diff >  MAX_STEP_X10) diff =  MAX_STEP_X10;
+    if (diff < -MAX_STEP_X10) diff = -MAX_STEP_X10;
+
+    prev_x10 = (int16_t)(prev_x10 + diff);
+
+    prev_subcool_hold = (float)prev_x10;
+    return prev_x10;
+}
+
+//int16_t get_subcool_temp(void){
+//    float hold = ntc_temp[6] - ntc_temp[7];
+//    hold = hold * 10.0f;
+//    
+//    if(!start_subcool_hold){
+//        if( (prev_subcool_hold < (hold - filter_temp - 0.5f)) || (prev_subcool_hold > (hold + filter_temp + 0.5f)) ){
+//            hold = prev_subcool_hold;
+////            printf("subcool hold: %0.1f ", hold);
+//            return (int16_t) hold;
+//        }
+//    }
+//        prev_subcool_hold = hold;
+//        start_subcool_hold = false;
+////        printf("subcool hold: %0.1f\n", hold);
+//        return (int16_t) hold;
+//}
+
+
+//ERROR_LED_SET()
+//ERROR_LED_TOGGLE()
+//ERROR_LED_nSET()
 /*================================================
  KTYPE Temperature Conversion Functions
    ===============================================*/
@@ -210,68 +409,17 @@ KTYPE_STATE_t KTYPE_start_conversion(void){
 }
 
     
-//};
-// Incoming command =  
-//[Start Byte: 1 byte]
-//[Command ID: 1 byte]
-//[Data Length: 1 byte]
-//[Data Payload Request: 2 bytes]
-//[Checksum: 1 byte]
-//[End Byte: 1 byte]
 
-//// Read NTC sensor (placeholder)
-//int16_t readNTCSensor(uint8_t sensorNum) {
-//    // TODO: Configure MCC ADC0 to read NTC voltage
-//    // 1. Select ADC channel for sensorNum (e.g., AIN0-AIN7 for NTC 1-8)
-//    // 2. Read voltage, convert to resistance (e.g., voltage divider)
-//    // 3. Convert resistance to temperature using Steinhart-Hart or lookup table
-//    // 4. Scale to °C × 10 (e.g., 36.8°C ? 368, -5.2°C ? -52)
-//    // Dummy values in range -40°C to 150°C
-//    float temp;
-//    switch (sensorNum) {
-//        case 1: temp = 36.8; break; // Example: NTC 1 = 36.8°C
-//        case 2: temp = -5.2; break; // Example: NTC 2 = -5.2°C
-//        default: temp = 25.0; // Default for others
-//    }
-//    return (int16_t)(temp * 10); // Convert to °C × 10 (e.g., 368, -52)
-//}
-//
 // Read K-type thermocouple (placeholder)
 KTYPE_ERROR_t readKTypeSensor(float *thermo, float *junc) {
-    // TODO: Configure MCC SPI for MAX31855 or similar
-    // 1. Read temperature via SPI
-    // 2. Apply cold junction compensation if needed
-    // 3. Scale to °C × 10
-    
-    // max31855kasa
-    // 32 bits read only
-    // unconnected = 011111111 binary temp data
-    // MSBF
-    // D31 = signed
-    // D[30:18] = 14 bit thermocouple data
-    // D[17] = reserved
-    // D[16] = high when fault
-    // D[15:4] = 12 bit reference junction temp data
-    // D[3] = reserved
-    // D[2] = short Vcc
-    // D[1] = short GND
-    // D[0] = open circuit
-    // power up time = 200ms // this should be taken into account!!!!!!!!! has not been implimented just yet!!!
-    // convertion time = 70ms
-//    uint16_t thermoBuffer;
-//    bool fault;
-//    uint16_t juncBuffer;
-//    bool shortVcc;
-//    bool shortGND;
-//    bool openCircuit;
-////////////////////////////////
+
     uint8_t rxBuffer[4];
     DISABLE_NTC_MUX();
-    ENABLE_KTYPE();
+    ENABLE_KTYPE_PIN();
     _delay_us(1);
 //    SPI0_BufferRead(rxBuffer, 4);
     KTYPE_bitbang(rxBuffer);
-    DISABLE_KTYPE();
+    DISABLE_KTYPE_PIN();
     
     int16_t thermocoupleRaw;
     int16_t coldJunctionRaw;
@@ -305,7 +453,7 @@ KTYPE_ERROR_t readKTypeSensor(float *thermo, float *junc) {
     if (data & 0x80000000UL) {                // sign extend
         thermocoupleRaw |= 0xC000;
     }
-    *thermo = thermocoupleRaw * 0.25f;
+    *thermo = thermocoupleRaw * 0.25f + 35;
 
     // Extract cold junction temp
     coldJunctionRaw = (data >> 4) & 0x0FFF;   // 12-bit
@@ -328,9 +476,9 @@ KTYPE_SENSOR_t read_ktype(void){
         buffer.cold_junction = 0;
         return buffer;
     }
-    float hold = therm*100;
+    float hold = therm*100.0f;
     buffer.temp = (int16_t) hold; // Note master; preserve .2f
-    hold = junc*100;
+    hold = junc*100.0f;
     buffer.cold_junction = (int16_t) hold; // Note master; preserve .2f
     buffer.error = ktype_error;
     return buffer;
@@ -348,5 +496,36 @@ void KTYPE_timer_CapCallBack(void){
 void KTYPE_Init(void){
     TCB2_CaptureCallbackRegister(KTYPE_timer_CapCallBack);
     KTYPE_start_conversion();
-//    DS_Init();
 }
+
+
+
+    // TODO: Configure MCC SPI for MAX31855 or similar
+    // 1. Read temperature via SPI
+    // 2. Apply cold junction compensation if needed
+    // 3. Scale to °C × 10
+    
+    // max31855kasa
+    // 32 bits read only
+    // unconnected = 011111111 binary temp data
+    // MSBF
+    // D31 = signed
+    // D[30:18] = 14 bit thermocouple data
+    // D[17] = reserved
+    // D[16] = high when fault
+    // D[15:4] = 12 bit reference junction temp data
+    // D[3] = reserved
+    // D[2] = short Vcc
+    // D[1] = short GND
+    // D[0] = open circuit
+    // power up time = 200ms // this should be taken into account!
+    // convertion time = 70ms
+//    uint16_t thermoBuffer;
+//    bool fault;
+//    uint16_t juncBuffer;
+//    bool shortVcc;
+//    bool shortGND;
+//    bool openCircuit;
+////////////////////////////////
+
+

@@ -1,6 +1,6 @@
 build/default/production/functions/temp_sensors.o.d \
  build/default/production/functions/temp_sensors.o: \
- functions/temp_sensors.c functions/definitions.h \
+ functions/temp_sensors.c functions/definitions_sensor.h \
  functions/../mcc_generated_files/system/pins.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\io.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\sfr_defs.h \
@@ -41,6 +41,7 @@ build/default/production/functions/temp_sensors.o.d \
  functions/../mcc_generated_files/system/../uart/uart_drv_interface.h \
  functions/../mcc_generated_files/system/../uart/uart_types.h \
  functions/../mcc_generated_files/system/../uart/usart2.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h \
  functions/../mcc_generated_files/system/../system/interrupt.h \
  functions/../mcc_generated_files/system/../system/../system/utils/atomic.h \
  functions/../mcc_generated_files/system/../spi/spi0.h \
@@ -61,11 +62,10 @@ build/default/production/functions/temp_sensors.o.d \
  c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\float.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h \
- functions/debug_uart2.h functions/../mcc_generated_files/timer/tcb0.h \
- functions/../DS.h functions/../functions/definitions.h \
+ functions/debug_uart2.h functions/../DS.h \
  functions/../mcc_generated_files/uart/usart1.h
 
-functions/definitions.h:
+functions/definitions_sensor.h:
 
 functions/../mcc_generated_files/system/pins.h:
 
@@ -147,6 +147,8 @@ functions/../mcc_generated_files/system/../uart/uart_types.h:
 
 functions/../mcc_generated_files/system/../uart/usart2.h:
 
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\stdio.h:
+
 functions/../mcc_generated_files/system/../system/interrupt.h:
 
 functions/../mcc_generated_files/system/../system/../system/utils/atomic.h:
@@ -191,10 +193,6 @@ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h:
 
 functions/debug_uart2.h:
 
-functions/../mcc_generated_files/timer/tcb0.h:
-
 functions/../DS.h:
-
-functions/../functions/definitions.h:
 
 functions/../mcc_generated_files/uart/usart1.h:

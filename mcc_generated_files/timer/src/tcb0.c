@@ -59,7 +59,7 @@ void TCB0_Initialize(void)
         | (0 << TCB_EDGE_bp)   // EDGE disabled
         | (0 << TCB_FILTER_bp);  // FILTER disabled
 
-    TCB0.CCMP = 0xBB80U;  // CCMP 0xBB80
+    TCB0.CCMP = 0xFA00U;  // CCMP 0xFA00
 
     TCB0.CNT = 0x0;  // CNT 0xNAN
 
@@ -75,7 +75,7 @@ void TCB0_Initialize(void)
         | (0 << TCB_OVF_bp);  // OVF disabled
 
     TCB0.CTRLA = (0 << TCB_CASCADE_bp)   // CASCADE disabled
-        | (TCB_CLKSEL_DIV2_gc)   // CLKSEL DIV2
+        | (TCB_CLKSEL_DIV1_gc)   // CLKSEL DIV1
         | (1 << TCB_ENABLE_bp)   // ENABLE enabled
         | (0 << TCB_RUNSTDBY_bp)   // RUNSTDBY disabled
         | (0 << TCB_SYNCUPD_bp);  // SYNCUPD disabled

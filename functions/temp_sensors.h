@@ -16,12 +16,12 @@
 #include <stddef.h>
 #include "../functions/ds18b20.h"
 
-#define V_REF 3.0        // Reference voltage (V)
-#define devider_12b 4096 // Reference to ADC V_ref's devidable
-#define R_FIXED 10000.0  // Fixed resistor (ohms)
-#define R_25 10000.0     // NTC resistance at 25°C (ohms)
-#define BETA 3977.0      // Beta value (K)
-#define T_25 298.15      // 25C in Kelvin
+#define V_REF 3.0f        // Reference voltage (V)
+#define devider_12b 4096.0f // Reference to ADC V_ref's devidable
+#define R_FIXED 10000.0f  // Fixed resistor (ohms)
+#define R_25 10000.0f     // NTC resistance at 25°C (ohms)
+#define BETA 3977.0f      // Beta value (K)
+#define T_25 298.15f      // 25C in Kelvin
 
 #define Antc_PORT PORTC
 #define Antc_PIN_bm PIN2_bm
@@ -61,8 +61,8 @@
 #define ENABLE_NTC_MUX() IO_PD7_SetHigh()
 #define DISABLE_NTC_MUX() IO_PD7_SetLow()
 
-#define ENABLE_KTYPE() IO_PD1_SetLow();
-#define DISABLE_KTYPE() IO_PD1_SetHigh();
+#define ENABLE_KTYPE_PIN() IO_PD1_SetLow();
+#define DISABLE_KTYPE_PIN() IO_PD1_SetHigh();
 
 typedef enum{
     KTYPE_IDLE = 0,
@@ -80,7 +80,7 @@ typedef enum{
 
 typedef struct {
     int16_t temp;      // 0.1 °C
-    uint16_t error;    // NTC error bits
+    uint8_t error;    // NTC error bits
 } NTC_SENSOR_t;
 
 typedef struct {
@@ -89,11 +89,6 @@ typedef struct {
     KTYPE_ERROR_t error;        // Error bits
 } KTYPE_SENSOR_t;
 
-typedef struct {
-    int16_t temp;       // 0.1°C
-    uint16_t humidity;  // 0.1 %RH
-    uint16_t error;     // Error bits
-} DHT22_SENSOR_t;
 
 void tempSensors_init(void);
 void CS_NTC(uint8_t ntc_num);
@@ -115,6 +110,9 @@ void KTYPE_Init(void);
 
 void KTYPE_timer_CapCallBack(void);
 
+int16_t get_chamber_temp(void);
+int16_t get_superheat_temp(void);
+int16_t get_subcool_temp(void);
 
 #ifdef	__cplusplus
 extern "C" {
